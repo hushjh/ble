@@ -1,0 +1,60 @@
+var	hammerul =new Hammer(document.getElementById("spul"));
+var mx=my=tsx=tsy=0;
+hammerul.on("panmove", function (e) {
+	
+	var divWidth=$("#wrap").width()*0.9;//底部div的宽度
+	var ulWidth=$("#spul").width();//滑动层的宽度
+	var tmpx;
+	tmpx=tsx+e.deltaX-mx;
+	if(tmpx>=(divWidth-ulWidth) && tmpx<=0)
+	{//控制 拖拽，以免超出画布范围
+		//每次只需把拖动的增量 加到画布原点偏移量中，
+		tsx=tmpx;
+		slider();
+	}
+	
+	mx=e.deltaX;//记录前一次拖动的偏移量
+   //document.getElementById("blText").value = "X偏移量：【" + e.deltaX + "】，Y偏移量：【" + e.deltaY + "】<br />";
+   //控制台输出
+});
+
+hammerul.on("panend", function (e) {
+	mx=0;
+});
+
+
+function slider(){
+	$("#spul").css("left",tsx);
+}
+
+//上面内容为场景图片滑动
+
+var canpicindex=0;
+
+$("#listOpen").click(function(){
+	
+});
+$("#listDel").click(function(){
+	
+});
+$("#listMdName").click(function(){
+	
+});
+$("#listMdBotPic").click(function(){
+	
+});
+
+//场景图片点击事件
+$("#spul ").on('click','li',function(){//动态添加元素，绑定事件
+	imgindex=$(this).index();
+	alert("imgindex:"+imgindex);
+	var offset=$(this).offset();
+	var lileft=offset.left;
+	var dwoffset=$("#swip").offset();
+	var dwleft=dwoffset.left;
+	if((lileft-dwleft+100)>$("#swip").width()){
+		$("#orderDiv").css("left",(dwleft+$("#swip").width()-100));
+	}
+	$("#orderDiv").css("left",lileft);
+	$("#orderDiv").toggleClass("hidden");
+});

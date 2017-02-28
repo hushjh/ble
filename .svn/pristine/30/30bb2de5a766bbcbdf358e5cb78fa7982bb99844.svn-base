@@ -1,0 +1,78 @@
+var	hammerul =new Hammer(document.getElementById("spul"));
+var mx=my=tsx=tsy=0;
+hammerul.on("panmove", function (e) {
+	
+	var divWidth=$("#wrap").width()*0.9;//底部div的宽度
+	var ulWidth=$("#spul").width();//滑动层的宽度
+	var tmpx;
+	tmpx=tsx+e.deltaX-mx;
+	if(tmpx>=(divWidth-ulWidth) && tmpx<=0)
+	{//控制 拖拽，以免超出画布范围
+		//每次只需把拖动的增量 加到画布原点偏移量中，
+		tsx=tmpx;
+		slider();
+	}
+	
+	mx=e.deltaX;//记录前一次拖动的偏移量
+   //document.getElementById("blText").value = "X偏移量：【" + e.deltaX + "】，Y偏移量：【" + e.deltaY + "】<br />";
+   //控制台输出
+});
+
+hammerul.on("panend", function (e) {
+	mx=0;
+});
+
+
+function slider(){
+	$("#spul").css("left",tsx);
+}
+
+//上面内容为场景图片滑动
+
+var imgindex=0;//申明 被点击的场景图片为第0个元素
+
+function dbToLine(rdata){
+	alert("rdata:"+rdata);
+	for(var i=0;i<rdata.length;i++){
+		 line[i].startPoint.x=rdata[i].startx;
+		 line[i].startPoint.y=rdata[i].starty;
+		 line[i].endPoint.x=rdata[i].endx;
+		 line[i].endPoint.y=rdata[i].endy;
+		 line[i].name=rdata[i].name;
+		 line[i].len=rdata[i].len;
+		 line[i].angel=rdata[i].angel;
+		 line[i].des=rdata[i].des;
+	}
+	reDraw();
+}
+
+$("#listOpen").click(function(){//在画布上打开该场景图片
+//	1.根据场景图片imgindex，到数组中取出imgid[index]的图片id，
+//	2.根据 id,到line表里取出对应的线条,将该线条数组赋值给line数组
+//	3.然后将线条显示在画布上
+	var canpicid=imgid[imgindex];
+	getLines(canpicid,dbToLine);
+});
+$("#listDel").click(function(){//删除该场景图片
+	
+});
+$("#listMdName").click(function(){//修改场景图片名称
+	
+});
+$("#listMdBotPic").click(function(){//更换场景图片底图
+	
+});
+
+//场景图片点击事件
+$("#spul ").on('click','li',function(){//动态添加元素，绑定事件
+	imgindex=$(this).index();//从0开始
+	var offset=$(this).offset();
+	var lileft=offset.left;
+	var dwoffset=$("#swip").offset();
+	var dwleft=dwoffset.left;
+	if((lileft-dwleft+100)>$("#swip").width()){
+		$("#orderDiv").css("left",(dwleft+$("#swip").width()-100));
+	}
+	$("#orderDiv").css("left",lileft);
+	$("#orderDiv").toggleClass("hidden");
+});

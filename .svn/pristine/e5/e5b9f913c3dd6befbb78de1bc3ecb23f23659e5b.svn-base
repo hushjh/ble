@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" type="text/css" href="./css/common.css" />
+    <style type="text/css">
+    	.index_logo{
+    		width:100%;
+    		height:60%;
+    		background:#540c0d;
+    	}
+    	.toplogo {
+			width: 100px;
+			height: 100px;
+			margin: 40% auto 0 auto;
+			border-radius: 50px;
+			overflow: hidden;
+		}
+		.img-logo{
+			width:100;
+			height:100px;
+		}
+		.logo_tit{
+			margin:10px auto 0 auto;
+			text-align:center;
+			color:#AAAAAA;
+		}
+    	.index_section{
+    		width:100%;
+    		height:40%;
+    		background-color:#b74631;
+    		padding-top:50px;
+    		box-sizing:border-box;
+    	}
+    	.function{
+    		float:left;
+    		width:50%;
+    		margin-bottom:20px;
+    	}
+    	.toppic,.bottomfont{
+    		margin:0 auto 0 auto;
+    	}
+    	.toppic{
+    		width:80px;
+    		height:60px;
+    		text-align:center;
+    	}
+    	
+    	.bottomfont{
+    		text-align:center;
+    		font-size:14px;
+    		color:#999999;
+    	}
+    	
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div class="index_logo">
+        	<div class="toplogo" >
+	            <img src="image/index/logo_open56.png" class="img-logo">
+	        </div>
+	        <div class="logo_tit">天健激光测距仪</div>
+        </div>
+        <div class="index_section">
+        	<div class="function" id="measure">
+        		<div class="toppic">
+        			<img src="image/index/measure.png" class="topimg">
+        		</div>
+        		<div class="bottomfont">场景测量</div>
+        	</div>
+        	<div class="function" id="resume">
+        		<div class="toppic">
+        			<img src="image/index/data.png" class="topimg">
+        		</div>
+        		<div class="bottomfont">公司简介</div>
+        	</div>
+        	<div class="function" id="product">
+        		<div class="toppic">
+        			<img src="image/index/production.png" class="topimg">
+        		</div>
+        		<div class="bottomfont">产品动态</div>
+        	</div>
+        	<div class="function" id="more">
+        		<div class="toppic">
+        			<img src="image/index/more.png" class="topimg">
+        		</div>
+        		<div class="bottomfont">更多功能</div>
+        	</div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="./script/common.js"></script>
+<script type="text/javascript" src="./script/createDb.js"></script>
+<script type="text/javascript">
+	apiready = function() {
+		db = api.require('db');
+		createTable();
+		//fixStatusBar("header");
+	}
+	function eleClick(){
+		exit_app();
+	}
+	$("#measure").click(function(){
+		api.openWin({
+            name: 'win_drawLine',
+            url: 'html/win_drawLine.html'
+        });
+	});
+	$("#resume").click(function(){
+		api.openWin({
+            name: 'win_resume',
+            url: 'html/win_resume.html'
+        });
+	});
+	$("#product").click(function(){
+		api.openWin({
+            name: 'win_product',
+            url: 'html/win_product.html'
+        });
+	});
+	$("#more").click(function(){
+		api.openWin({
+            name: 'win_more',
+            url: 'html/win_more.html'
+        });
+	});
+</script>
+</html>

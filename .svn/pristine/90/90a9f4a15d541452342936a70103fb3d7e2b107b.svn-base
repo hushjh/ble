@@ -1,0 +1,588 @@
+//画布偏移量 + 页面坐标=数组坐标*放大倍数//用于放大后，点击页面的点与line数组转换
+var grid_x=20,grid_y=20;
+var isMouseDown=false;//触控是否开始
+var lastLoc={x:0,y:0};
+var curLoc={x:0,y:0};
+var line=[];//[{startPoint:{x:0,y:0},endPoint:{x:0,y:0}，name:'',len:'',angel:'',des:''}];//2维数组存线条
+var hback=[]//历史后退[{startPoint:{x:0,y:0},endPoint:{x:0,y:0}，name:'',len:'',angel:'',des:''，index:'',opr:''}];//2维数组存线条
+var hbefore=[]//历史前进 数组结构跟历史后退结构一样，opr 的取值范围‘n’新建，'m'修改,'d'删除
+var isNewLine=0;//是否是新画线条
+var isPushMem=true;//是否需要保存触屏的坐标点
+var isM=0;//是否有线条被修改，每次修改isM 值累加1
+var mofifyIndex,changePoint;
+var moveStrokeColor="#ff0000",MemStrokeColor="#000000";//移动中的线条为红色，静止的线条为黑色
+var linWidth=6;
+var delIndex,delPoint={x:0,y:0};
+var startTime,endTime;
+var recx,recy;//画矩形时，矩形的起始坐标点
+var scaleNum=1;
+var tsx=tsy=0;//平移的x,y
+apiready = function(){
+		fixStatusBar("header");
+		canvasWidth=$("#main").width();
+		canvasHeight=$("#main").height();
+		canvas=document.getElementById("canvas");
+		context=canvas.getContext("2d");
+		canvas.width=canvasWidth;
+		canvas.height=canvasHeight;
+		
+		drawGrid();
+	};
+
+
+function hbackData(l,indexx,oprr){//每执行一次，新增，修改，删除操作，都调用一次该函数，将修改之前的状态保存起来
+	var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des,index:indexx,opr:oprr};
+	hback.push(ll);
+}	
+function changeTopBar(){//改变顶部导航栏,返回主页导航
+	$(".home").addClass("active");
+	$(".del").removeClass("active");
+	delIndex=-1;
+	
+	context.clearRect(0,0,canvasWidth,canvasHeight);
+	drawGrid();
+	drawMemLine();
+}
+function delLine(){
+	hbackData(line[delIndex],delIndex,'d');//删除线条之前，将该条线条保存到回退当中，
+	line.splice(delIndex,1);
+	
+}//删除线条
+
+function MoveCanvas(){
+	reDraw();
+}
+
+//harmer.js  pinch 事件
+//创建一个新的hammer对象并且在初始化时指定要处理的dom元素
+var	hammertime =new Hammer(document.getElementById("canvas"));
+///为该dom元素指定触屏移动事件
+hammertime.add(new Hammer.Pinch());//pinch 事件 必须写这一句
+//添加事件
+hammertime.on("pinchout", function (e) {
+ //控制台输出
+ 	if(scaleNum<4){
+ 		scaleNum+=0.1;
+ 		reDraw();
+ 	}
+     
+});
+hammertime.on("pinchin", function (e) {
+ //控制台输出
+     if(scaleNum>1){
+ 		scaleNum-=0.1;
+ 		if(scaleNum==1){//如果放大倍数为1,则让画布原点回到(0,0)
+ 			tsx=tsy=0;
+ 		}
+ 		reDraw();
+ 	}
+});
+
+hammertime.on("panmove", function (e) {
+	
+	if(!isNewLine && isM==0){
+		if(-canvasWidth*(scaleNum-1)<=(tsx+e.deltaX) &&  (tsx+e.deltaX)<=0)
+		{//控制 拖拽，以免超出画布范围
+			tsx=tsx+e.deltaX/scaleNum;
+		}
+		if(-canvasHeight*(scaleNum-1)<=(tsy+e.deltaY) &&  (tsy+e.deltaY)<=0)
+		{
+			tsy=tsy+e.deltaY/scaleNum;
+		}
+		MoveCanvas();
+	}
+
+   document.getElementById("blText").value = "X偏移量：【" + e.deltaX + "】，Y偏移量：【" + e.deltaY + "】<br />";
+   //控制台输出
+});
+hammertime.on("panend", function (e) {
+	
+});
+	
+///**********************页面按钮事件
+$("#backdraw").click(function(){//历史后退
+	var len_hbk=hback.length;
+	if(hback.length>0){
+		switch(hback[len_hbk-1].opr){
+			case'n'://新建操作后退的话，则删除
+				var l=hback.pop();
+				var index=l.index;
+				//ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:'l.name',len:'l.len',angel:'l.angel',des:'l.des'};
+				var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des,index:l.index,opr:l.opr};
+				hbefore.push(ll);//历史前进，不需要反着来
+				line.splice(index,1);
+				break;
+			case'm'://修改操作后退的话，修改就行
+				var l=hback.pop();
+				var index=l.index;
+				var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des};
+				var bl={startPoint:{x:line[index].startPoint.x,y:line[index].startPoint.y},endPoint:{x:line[index].endPoint.x,y:line[index].endPoint.y},name:line[index].name,len:line[index].len,angel:line[index].angel,des:line[index].des,index:index,opr:'m'};
+				hbefore.push(bl);//在line数组修改之前，先将第index个元素保存到历史前进中。
+				line.splice(index,1,ll);
+				
+				break;
+			case'd'://删除操作后退的话，新建
+				var l=hback.pop();
+				var index=l.index;
+				var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des};
+				line.splice(index,0,ll);
+				hbefore.push(ll);//历史前进，不需要反着来，直接删除，
+				break;
+		}	
+		reDraw();
+	}
+});
+$("#beforedraw").click(function(){//历史前进
+	var len_hbf=hbefore.length;
+	if(hbefore.length>0){
+		switch(hbefore[len_hbf-1].opr){
+			case'n'://新建操作前进的话，则新建
+				var l=hbefore.pop();
+				var index=l.index;
+				//ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:'l.name',len:'l.len',angel:'l.angel',des:'l.des'};
+				var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des,index:l.index,opr:l.opr};
+				line.splice(index,0,ll);
+				hback.push(ll);//历史后退
+				break;
+			case'm'://修改操作后退的话，修改就行
+				var l=hbefore.pop();
+				var index=l.index;
+				var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des};
+				var hl={startPoint:{x:line[index].startPoint.x,y:line[index].startPoint.y},endPoint:{x:line[index].endPoint.x,y:line[index].endPoint.y},name:line[index].name,len:line[index].len,angel:line[index].angel,des:line[index].des,index:index,opr:'m'};
+				hback.push(hl);//在line数组修改之前，先将第index个元素保存到历史前进中。
+				line.splice(index,1,ll);
+				
+				break;
+			case'd'://删除操作后退的话，就直接删除
+				var l=hbefore.pop();
+				var index=l.index;
+				var ll={startPoint:{x:l.startPoint.x,y:l.startPoint.y},endPoint:{x:l.endPoint.x,y:l.endPoint.y},name:l.name,len:l.len,angel:l.angel,des:l.des};
+				var hl={startPoint:{x:line[index].startPoint.x,y:line[index].startPoint.y},endPoint:{x:line[index].endPoint.x,y:line[index].endPoint.y},name:line[index].name,len:line[index].len,angel:line[index].angel,des:line[index].des,index:index,opr:'d'};
+				hback.push(ll);//历史后退，直接删除，
+				line.splice(index,1);
+				break;
+		}	
+		reDraw();
+	}
+});
+$("#draw").click(function(){
+	if(isNewLine==0){
+		isNewLine=1;//重新画一条线
+	}else{
+		isNewLine=0;//修改以前的线条
+	}
+	$("#draw").toggleClass("active");
+});
+$("#rubishi").click(function(){
+	delLine();
+	changeTopBar();
+});
+
+$("#oki").click(function(){
+	
+	changeTopBar();
+});
+//listmode 里的事件
+$("#listi").click(function(){
+	$("#listMode").removeClass("hidden");
+});
+$("#cancel").click(function(){//取消按钮
+	$("#listMode").addClass("hidden");
+	changeTopBar();
+});
+$("#sure").click(function(){//确定按钮
+	
+	var name=$("#name").val();
+	var len=$("#len").val();
+	var angel=$("#angel").val();
+	var des=$("#des").val();
+	line[delIndex].name=name;
+	line[delIndex].len=len;
+	line[delIndex].angel=angel;
+	line[delIndex].des=des;
+	
+	$("#listMode").addClass("hidden");
+	changeTopBar();//这个函数 将delIndex的值变为-1 所以必须写在最后,同事也有刷新画布的作用
+});
+$(".row").click(function(){
+	$(this).children(".bottomLine").addClass("active");
+	$(this).siblings().children(".bottomLine").removeClass("active");
+});
+
+///////////////触屏事件
+canvas.addEventListener('touchstart',function(e){
+	e.preventDefault();
+	touch=e.touches[0];
+	startTime=Date.now();
+	beginStroke({x:touch.pageX,y:touch.pageY});
+});
+canvas.addEventListener('touchmove',function(e){
+	e.preventDefault();
+	if(isMouseDown){
+		touch=e.touches[0];
+		moveStroke({x:touch.pageX,y:touch.pageY});
+	}
+});
+canvas.addEventListener('touchend',function(e){
+	e.preventDefault();
+	endTime=Date.now();
+	endStroke();
+});
+
+////////////////////画线的三个步骤
+function beginStroke(point){
+	isMouseDown=true;
+	isPushMem=true;
+	lastLoc=windowToCanvas(point.x,point.y);
+	delPoint.x=lastLoc.x;
+	delPoint.y=lastLoc.y;
+    lastLoc=onPoint(lastLoc);
+    if(isNewLine){
+    	
+    }else{
+    	if(line.length>0){
+    		isM=0;//是否有线条被修改
+    		$.each(line,function(i,l){//检测触屏点是否跟画布上线条的端点重合
+//	    		if((l.startPoint.x*scaleNum==lastLoc.x)&&(l.startPoint.y*scaleNum==lastLoc.y) ){
+//	    			//lastLoc=l.endPoint;
+//	    			mofifyIndex=i;
+//	    			changePoint=0;
+//	    			isM++;
+//	    			//line.splice(i,1);//从start的位置开始向后删除delCount个元素
+//	    		}else if((l.endPoint.x*scaleNum==lastLoc.x)&&(l.endPoint.y*scaleNum==lastLoc.y)){
+//	    			//lastLoc=l.startPoint;
+//	    			mofifyIndex=i;
+//	    			changePoint=1;
+//	    			isM++;
+//	    			//line.splice(i,1);//若修改线条，则重数组中删除该线条，
+//	    		}
+				if(isInArc(l.startPoint)){//检测触屏点是否在端点的圆圈内
+	    			//lastLoc=l.endPoint;
+	    			mofifyIndex=i;
+	    			changePoint=0;
+	    			isM++;
+	    			//line.splice(i,1);//从start的位置开始向后删除delCount个元素
+	    		}else if(isInArc(l.endPoint)){
+	    			//lastLoc=l.startPoint;
+	    			mofifyIndex=i;
+	    			changePoint=1;
+	    			isM++;
+	    			//line.splice(i,1);//若修改线条，则重数组中删除该线条，
+	    		}
+	    	});
+	    	if(!isM){//没有线条被修改，在移动不划线
+	    		isMouseDown=false;//移动不画线
+	    	}else{//有线条将被修改，则将该线条此时的状态存入历史回退中
+	    		hbackData(line[mofifyIndex],mofifyIndex,'m');
+	    	}
+    	}else{
+    		isMouseDown=false;//移动不画线
+    	}
+    	isPushMem=false;//如果不是重新画线，则不记录新的点
+    }
+    
+}
+function endStroke(point){
+	isMouseDown=false;
+	
+	if((endTime-startTime)<100){//如果触摸开始与结束的时间差小于100则视为点击事件
+		if(isNewLine){
+		}else{//点击事件不是在新加线条的场景下触发，则检测，点击的坐标是否在某条线上。
+			//alert("delPoint.x:"+delPoint.x+",delPoint.y:"+delPoint.y);
+			if(isOnLine(delPoint)){//如果触摸点在线条上
+//				context.clearRect(0,0,canvasWidth,canvasHeight);
+//				drawGrid();
+//				drawMemLine();
+				//reDraw();
+				$(".del").addClass("active");
+				$(".home").removeClass("active");
+			}else{//如果点击的点不在画布上则刷新画布
+				changeTopBar();//头部导航换成主页导航
+				$("#listMode").addClass("hidden");//关闭输入层div
+			}
+			mofifyIndex=-1; //此时修改结束，不需要将修改的线条画成红色
+			isM=0;//将修改清0//点击的点刚好在线条端点上，只不过是单击事件，则关闭修改。
+		}
+		reDraw();
+	}else{//如果不为点击事件
+		if(isPushMem){//如果不是重新画线，则不记录新的点
+			pushMemory(lastLoc,curLoc);
+			hbackData(line[line.length-1],line.length-1,'n');//新画线，则将记录是第几条线条被修改，以便于回退
+		}
+		if(isNewLine || isM>0){//如果是新画线，或者有线条被修改，这两个事件结束后将画布上的线条全部变成黑色
+			mofifyIndex=-1; //此时修改结束，不需要将修改的线条画成红色
+			isM=0;//将修改清0
+//			context.clearRect(0,0,canvasWidth,canvasHeight);
+//			drawGrid();
+//			drawMemLine();
+			reDraw();
+		}
+	}
+	
+	
+}
+
+function moveStroke(point){
+	curLoc=windowToCanvas(point.x,point.y);
+	curLoc=onPoint(curLoc);
+	//draw
+	//context.save();//保存当前canvas的状态
+	context.clearRect(0,0,canvasWidth,canvasHeight);
+	drawGrid();
+	if(isNewLine){//是否 画新的线条
+		if((curLoc.x==lastLoc.x)&&(curLoc.y==lastLoc.y) ){//touch没有移动，说明是点击事件，
+			isPushMem=false;//如果是单击，则不记录单击的点
+		}else{//不为点击事件
+			isPushMem=true;
+			context.save();
+			context.translate(tsx,tsy);
+			context.scale(scaleNum,scaleNum);
+			context.beginPath();
+			context.moveTo((lastLoc.x+(-tsx))/scaleNum,(lastLoc.y+(-tsy))/scaleNum);
+			context.lineTo((curLoc.x+(-tsx))/scaleNum,(curLoc.y+(-tsy))/scaleNum);
+			context.strokeStyle=moveStrokeColor;
+			context.lineWidth=linWidth;
+			context.stroke();
+			context.restore();
+		}
+		
+	}else{//若是修改线条
+		if(changePoint==0){//起点被移动
+			line[mofifyIndex].startPoint.x=(curLoc.x+(-tsx))/scaleNum;
+			line[mofifyIndex].startPoint.y=(curLoc.y+(-tsy))/scaleNum;
+		}else{//终点被移动
+			line[mofifyIndex].endPoint.x=(curLoc.x+(-tsx))/scaleNum;
+			line[mofifyIndex].endPoint.y=(curLoc.y+(-tsy))/scaleNum;
+		}
+	}
+	drawMemLine();
+	
+	//context.restore();//恢复保存的Canvas的状态
+}
+
+
+function setPos(x1,y1,x2,y2){//设置矩形的起始坐标，和旋转度
+	var rt;
+	if((y1 != y2)){
+		if(x1<x2){//谁的x坐标小，谁为矩形起点
+			recx=x1,recy=y1;
+			//如果起点的y坐标小于终点的坐标，则角度为正，否则为负数
+			rt=Math.atan((y2-y1)/(x2-x1));
+			context.translate(recx,recy);
+			context.rotate(rt);
+		}else if(x1==x2){//线条垂直
+			if(y1<y2){
+				recx=x1,recy=y1;
+			}else{
+				recx=x2,recy=y2;
+			}
+			context.translate(recx,recy);
+			context.rotate(90*Math.PI/180);
+		}else{
+			recx=x2,recy=y2;
+			rt=Math.atan((y1-y2)/(x1-x2));
+			context.translate(recx,recy);
+			context.rotate(rt);
+		}
+		
+	}else{
+		if(x1<x2){
+			recx=x1,recy=y1;
+		}else{
+			recx=x2,recy=y2;
+		}
+	}
+}
+//单击的点是否在线条上
+function isOnLine(point){
+	var x0=point.x,y0=point.y;
+	for(var i=0;i<line.length;i++){
+		var x1=line[i].startPoint.x,y1=line[i].startPoint.y;
+		var x2=line[i].endPoint.x,y2=line[i].endPoint.y;
+		var w=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+		var h=20;
+		context.save();
+		context.translate(tsx,tsy);  
+		context.scale(scaleNum,scaleNum); 
+		context.beginPath();
+		setPos(x1,y1,x2,y2);
+		if(y1==y2){
+			context.rect(recx,recy-h/2,w,h);
+		}else{
+			
+			context.rect(0,-h/2,w,h);
+		}
+		context.strokeStyle=moveStrokeColor;
+		context.lineWidth=1;
+		
+	    if(context.isPointInPath(delPoint.x,delPoint.y)){
+	    	context.restore(); 
+	    	delIndex=i;
+	    	return true;
+	    }
+	    //context.stroke();
+	    context.restore(); 
+	    //context.rotate(45*Math.PI/180);
+	    //context.translate(-40,-40);
+	    //context.translate(recx,recy);
+	     
+	}
+	return false;
+}
+//写文本
+function drawText(){
+	for(var i=0;i<line.length;i++){
+		var x1=line[i].startPoint.x,y1=line[i].startPoint.y;
+		var x2=line[i].endPoint.x,y2=line[i].endPoint.y;
+		var w=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+		var h=10;
+		context.save();
+		context.translate(tsx,tsy);   
+		context.scale(scaleNum,scaleNum);
+		setPos(x1,y1,x2,y2);
+		context.textAlign="center";
+		context.textBaseline="top";
+		//context.fillText(line[i].name,w/2,5);//旋转的中心为矩形起点坐标，画布的原点和矩形起点重合
+		if(y1==y2){//水平画线，则不偏移，画布原点不变，矩形起点还是原来的坐标，
+			context.fillText(line[i].name,recx+w/2,recy+5);
+		}else{
+			context.fillText(line[i].name,w/2,5);
+		}
+		
+		if((line[i].len+line[i].angel)){//如果长度和角度为空则不用再画布上画出来
+			context.textAlign="center";
+			context.textBaseline="bottom";
+			if(y1==y2){
+				context.fillText(line[i].len+','+line[i].angel,recx+w/2,recy-5);
+			}else{
+				context.fillText(line[i].len+','+line[i].angel,w/2,-5);
+			}
+		}
+		
+	    context.restore();  
+		}
+}
+
+//点击端点是，根据单击的点是否在圆圈内，来判断是否单击这条线段
+function isInArc(point){
+	var r=8
+	context.save(); 
+	context.translate(tsx,tsy);
+	context.scale(scaleNum,scaleNum);
+	context.beginPath();
+	context.lineWidth=3;
+	context.strokeStyle=moveStrokeColor;
+	context.arc(point.x,point.y, r, 0, 2 * Math.PI);
+	if(context.isPointInPath(lastLoc.x,lastLoc.y)){
+		context.restore(); 
+		return true;
+	}
+	//context.stroke();
+	context.restore(); 
+	return false;
+}
+//画线结束后将线条存入内存中
+function pushMemory(startp,endp){
+	var str="线条"+(line.length+1);
+	//line 数组的坐标，以scaleNum=1 为基准。
+	var l={startPoint:{x:(startp.x+(-tsx))/scaleNum,y:(startp.y+(-tsy))/scaleNum},endPoint:{x:(endp.x+(-tsx))/scaleNum,y:(endp.y+(-tsy))/scaleNum},name:str,len:'',angel:'',des:''};
+	line.push(l);
+}
+function onPoint(point){//让线条的起点和终点都在网格交点上
+	var xx=point.x;
+	var yy=point.y;
+	return {x:Math.round(xx/grid_x)*grid_x,y:Math.round(yy/grid_y)*grid_y};
+}
+
+function windowToCanvas(x,y){
+	var bbox=canvas.getBoundingClientRect();
+	return {x:Math.round(x-bbox.left),y:Math.round(y-bbox.top)};
+}
+function reDraw(){//画布重画
+	context.clearRect(0,0,canvasWidth,canvasHeight);
+	drawGrid();
+	drawMemLine();
+}
+//将画布上已存在的线条 画出来
+function drawMemLine(){
+		
+	for(var i=0;i<line.length;i++){
+		context.save();
+		context.translate(tsx,tsy);
+		context.scale(scaleNum,scaleNum); 
+		context.beginPath();
+		context.moveTo(line[i].startPoint.x,line[i].startPoint.y);
+		context.lineTo(line[i].endPoint.x,line[i].endPoint.y);
+		
+		context.lineWidth=linWidth;
+		context.strokeStyle=MemStrokeColor;
+		context.setLineDash([15,5]);
+		if(i==mofifyIndex){//若不为新画线，当有线条被修改，需要重新画线时，被修改的线条颜色为红色，其余的为黑色
+			context.strokeStyle=moveStrokeColor;
+			context.setLineDash([]);
+		}
+		if(i==delIndex){//若为需要删除的线条，则颜色为红色
+			context.strokeStyle=moveStrokeColor;
+		}
+		 
+		context.stroke();
+		context.restore();
+	}
+	drawarc();
+	drawText();
+}
+
+function drawarc(){
+	var r1,r2;
+	context.setLineDash([]);
+	for(var i=0;i<line.length;i++){
+		r1=r2=8;
+		if(mofifyIndex==i){//若有线条将被修改，则端点圆圈变大
+			if(changePoint==0){
+				r1=20;
+			}else{
+				r2=20;
+			}
+		}
+		context.save(); 
+		context.translate(tsx,tsy);
+		context.scale(scaleNum,scaleNum);
+		context.beginPath();
+		context.lineWidth=3;
+		context.strokeStyle=moveStrokeColor;
+		context.arc(line[i].startPoint.x,line[i].startPoint.y, r1, 0, 2 * Math.PI);
+		context.stroke();
+		context.beginPath();
+		context.lineWidth=3;
+		context.strokeStyle=moveStrokeColor;
+		context.arc(line[i].endPoint.x,line[i].endPoint.y, r2, 0, 2 * Math.PI);
+		
+		context.stroke();
+		context.restore();
+	}
+}
+//画网格线	
+function drawGrid(){
+	canvasWidth=canvasWidth*scaleNum;
+	canvasWidth=canvasHeight*scaleNum;
+	context.save(); 
+	context.translate(tsx,tsy);
+	context.scale(scaleNum,scaleNum);
+	context.beginPath();
+	context.strokeStyle="#111111";
+	context.setLineDash([]);
+	//横向画网格线
+	for(var i=1,y=grid_y;y<canvasHeight;y=(++i)*grid_y){
+		context.moveTo(0,y);
+		context.lineTo(canvasWidth,y);
+		
+	}
+	for(var i=1,x=grid_x;x<canvasWidth;x=(++i)*grid_x){
+		context.moveTo(x,0);
+		context.lineTo(x,canvasHeight);
+		
+	}
+	context.lineWidth=0.1;
+	context.stroke();
+	context.restore();
+}

@@ -1,0 +1,66 @@
+
+var imgpath="fs://image/";
+var imgs=[];
+
+//将数据库里的所有canvas 图片取出来放在数组中
+function dbToarray(){
+	var rdata=[];
+	rdata=getCanpics();
+	if(!rdata){
+		return;
+	}
+	alert(rdata);
+	var str="data:image/png;base64,";
+	for(var i=0;i<rdata.length;i++){
+		var img64=str+imgTobase64(rdata[i].canpicurl);
+		imgs.push(img64);
+	}
+}
+
+// Converts canvas to an image点保存按钮后，保存画布上的线条到数据库，同事将画布转化成图片
+function convertCanvasToImage(canvas) {
+
+	var imgname=Date.now()+'.png';
+	
+	var dataUrl = canvas.toDataURL("image/png");
+	imgs.push(dataUrl);//当有新的图片被保存时，则存放在数组中
+	alert("dataUrl:" + dataUrl);
+	//str="data:image/png;base64,"
+	var pos = dataUrl.indexOf(',');
+	if (pos > 0) {
+		var data = dataUrl.substring(pos + 1);
+		trans.saveImage({
+			base64Str : data,
+			imgPath : imgpath,
+			imgName : imgname,
+			album : false
+		}, function(ret, err) {
+			if (ret.status) {
+				alert("保存成功");
+				saveimg(line,imgpath+imgname);
+				
+			} else {
+				api.alert({
+					msg : err.msg
+				});
+			}
+		});
+	}
+	return dataUrl;
+}
+
+function imgTobase64(url){
+	trans.decodeImgToBase64({
+	    imgPath: url
+	}, function(ret, err){        
+	    if( ret.status ){
+	        //alert( JSON.stringify( ret ) );
+	        return ret.base64Str;
+	    }else{
+	        alert( JSON.stringify( err ) );
+	    }
+	});
+}
+
+
+

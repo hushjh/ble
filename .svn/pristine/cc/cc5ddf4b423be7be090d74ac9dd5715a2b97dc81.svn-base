@@ -1,0 +1,24 @@
+
+
+apiready = function(){
+		fixStatusBar("header");
+		canvasWidth=$("#main").width();
+		canvasHeight=$("#main").height();
+		canvas=document.getElementById("canvas");
+		context=canvas.getContext("2d");
+		canvas.width=canvasWidth;
+		canvas.height=canvasHeight;
+		
+		drawGrid();
+	};
+	
+function drawGrid(){
+	context.strokeStyle="#636363";
+	context.beginPath();
+	context.moveTo(0,20);
+	context.lineTo(canvasWidth,20);
+	context.closePath();
+	context.lineWidth=0.5;
+	context.stroke();
+
+}

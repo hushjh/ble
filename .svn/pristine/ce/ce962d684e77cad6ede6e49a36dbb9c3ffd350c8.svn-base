@@ -1,0 +1,27 @@
+body {
+
+}
+#swip{
+	display:none;
+	width:90%;
+	height:200px;
+	position:fixed;
+	right:5%;
+	top:30%;
+	background-color:#000000;
+	overflow:hidden;/*隐藏div 溢出部分*/
+}
+
+ul{
+	display:-webkit-box;
+	margin:5px 0;
+	position:absolute;
+	left:-50px;
+}
+li{
+	margin-left:5px;
+}
+li img{
+	height:190px;
+	width:100px;
+}

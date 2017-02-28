@@ -1,0 +1,94 @@
+var groupIsOpen=0;//窗口组没打开
+apiready = function() {
+	fixStatusBar("header");
+	eleClick();
+};
+
+function openFg(index) {
+	api.openFrameGroup({
+		name : 'group1',
+		background : '#ff0',
+		scrollEnabled : true,
+		rect : {
+			x : 0,
+			y : 0,
+			w : 'auto',
+			h : 'auto'
+		},
+		index : index,
+		frames : [{
+			name : 'info_frm',
+			url : 'info_frm.html',
+			bgColor : '#ff0'
+		}, {
+			name : 'location_frm',
+			url : 'location_frm.html',
+			bgColor : '#fff'
+		}, {
+			name : 'deviceCheck_frm',
+			url : 'deviceCheck_frm.html',
+			bgColor : '#fff'
+		}, {
+			name : 'account_frm',
+			url : 'account_frm.html',
+			bgColor : '#fff'
+		}]
+	}, function(ret, err) {
+		if (ret) {
+			//alert(JSON.stringify(ret));
+		} else {
+			alert(JSON.stringify(err));
+		}
+	});
+}
+
+function eleClick() {
+	keyBackDoNone();
+	backToIndex();
+	$("#addEleIcon").click(function() {
+		api.openFrame({
+			name : 'addElement_frm',
+			url : 'addElement_frm.html',
+			rect : {
+				x : 0,
+				y : 0,
+				w : 'auto',
+				h : 'auto'
+			}
+		});
+	});
+	$("#footerBar li").click(function() {
+		var index;
+		var content = $(this).text();
+		switch(content) {
+			case "信息":
+				index=0;
+				break;
+			case "位置":
+				index=1;
+				break;
+			case "设备检查":
+				index=2;
+				break;
+			case "账户":
+				index=3;
+				break;
+		}
+		if(groupIsOpen==0){
+			openFg(index);
+			groupIsOpen=1;
+		}else{
+			api.setFrameGroupAttr({
+			    name: 'group1',
+			    hidden: false
+			});
+			api.setFrameGroupIndex({
+			    name: 'group1',
+			    index: 3,
+			    scroll: true
+			});
+		}
+		
+		
+	});
+}

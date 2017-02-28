@@ -1,0 +1,99 @@
+// 解决状态栏重合，并优化fixStatusBar代码,Android4.4版本以上添加25px
+               
+function fixStatusBar(headerid, callback) {
+	var header = $api.byId(headerid);
+	var systemType = api.systemType;
+	var systemVersion = parseFloat(api.systemVersion);
+	if (systemType == "ios" || (systemType == "android" && systemVersion >= 4.4)) {
+		if (systemType == "android") {
+			header.style.paddingTop = '25px';
+		}
+		$api.fixStatusBar(header);
+	} else {
+		$api.fixIos7Bar(header);
+	}
+	var headerPos = $api.offset(header);
+	if ( typeof callback == "function") {
+		callback(headerPos);
+	}
+}
+function exit_app() {
+	api.addEventListener({
+		name : 'keyback'
+	}, function(ret, err) {
+		api.toast({
+			msg : '再按一次返回键退出' + api.appName,
+			duration : 2000,
+			location : 'bottom'
+		});
+		api.addEventListener({
+			name : 'keyback'
+		}, function(ret, err) {
+			api.closeWidget({
+				id : 'A6917877192234', //你的APPid
+				retData : {
+					name : 'closeWidget'
+				},
+				animation : {
+					type : 'flip',
+					subType : 'from_bottom',
+					duration : 500
+				},
+				silent : true
+			});
+		});
+		setTimeout(function() {
+			exit_app();
+		}, 3000);
+	});
+}
+function keyBackTOAddMain() {
+	api.addEventListener({
+		name : 'keyback'
+	}, function(ret, err) {
+		alert("toaddmain");
+		api.openWin({
+			name : 'newProMain_win',
+			url : 'newProMain_win.html',
+			//reload: true,
+		});
+	});
+	
+}
+function keyBackTOIndex() {
+	api.addEventListener({
+		name : 'keyback'
+	}, function(ret, err) {
+		alert("toindex");
+		api.openWin({
+			name : 'index',
+			url : '../index.html',
+			reload: true,
+		});
+	});
+	
+}
+function keyBackDoNone() {
+	api.addEventListener({
+		name : 'keyback'
+	}, function(ret, err) {
+		
+	});
+	
+}
+function backToAddMain(){
+	$(".backIcon").click(function(){
+		api.openWin({
+	        name: 'newProMain_win',
+	        url: 'newProMain_win.html'
+        });
+	});
+}
+function backToIndex(){
+	$(".backIcon").click(function(){
+		api.openWin({
+	        name: 'index',
+	        url: '../index.html'
+        });
+	});
+}

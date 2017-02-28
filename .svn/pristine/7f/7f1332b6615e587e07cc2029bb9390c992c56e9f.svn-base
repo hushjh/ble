@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	#footerBar{
+    		width:100%;
+    		height:50px;
+    		border-top:1px solid #000;
+    		display:-webkit-box;
+    	}
+    	#footerBar li{
+    		-webkit-box-flex: 1;
+    		line-height:50px;
+    	}
+    	#footerBar li:not(:last-of-type){
+    		border-right:1px solid #000000;
+    	}
+    	
+    	#newEle{
+    		width:100%;
+    		margin-top:20px;
+    	}
+    	#topD{
+    		margin-left:10%;
+    		width:80%;
+    		height:100px;
+    		border:1px solid #000000;
+    		background-color:#FFFFFF;
+    	}
+    	#bottomD{
+    		height:20px;
+    		line-height:20px;
+    		font-size:12px;
+    		text-align:center;
+    	}
+    	.centerI{
+    		display:block;
+    		width:40px;
+    		height:40px;
+    		margin:30px auto;
+    		background-size:40px 40px;
+    		background-position:center;
+    		background-repeat:no-repeat;
+    	}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+			<i class="backBar backIcon"></i>
+			<h1>新建项目</h1>
+		</div>
+		
+		<div id="main">
+		<!--
+			<div id="newEle">
+				<div id="topD"><i class="centerI newIcon" id="addEleIcon"></i></div>
+				<div id="bottomD"><span>新建元素</span></div>
+			</div>
+		-->
+		</div>
+		
+		<div id="footer">
+			<ul id="footerBar">
+				<li id="info">信息</li>
+				<li id="loction">位置</li>
+				<li id="check">设备检查</li>
+				<li id="account">账户</li>
+			</ul>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/win_newProMain.js"></script>
+<script type="text/javascript">
+	
+</script>
+</html>

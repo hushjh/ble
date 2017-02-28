@@ -1,0 +1,33 @@
+
+var grid_x=20,grid_y=20;
+
+apiready = function(){
+		fixStatusBar("header");
+		canvasWidth=$("#main").width();
+		canvasHeight=$("#main").height();
+		canvas=document.getElementById("canvas");
+		context=canvas.getContext("2d");
+		canvas.width=canvasWidth;
+		canvas.height=canvasHeight;
+		
+		drawGrid();
+	};
+	
+function drawGrid(){
+	context.strokeStyle="#111111";
+	context.beginPath();
+	//横向画网格线
+	for(var i=1,y=grid_y;y<canvasHeight;y=(++i)*grid_y){
+		context.moveTo(0,y);
+		context.lineTo(canvasWidth,y);
+		
+	}
+	for(var i=1,x=grid_x;x<canvasWidth;x=(++i)*grid_x){
+		context.moveTo(x,0);
+		context.lineTo(x,canvasHeight);
+		
+	}
+	context.lineWidth=0.1;
+	context.stroke();
+
+}

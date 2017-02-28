@@ -1,0 +1,153 @@
+var	hammerul =new Hammer(document.getElementById("spul"));
+var mx=slsx=0;
+hammerul.on("panmove", function (e) {
+	
+	var divWidth=$("#wrap").width()*0.9;//底部div的宽度
+	var ulWidth=$("#spul").width();//滑动层的宽度
+	var tmpx;
+	tmpx=slsx+e.deltaX-mx;
+	if(tmpx>=(divWidth-ulWidth) && tmpx<=0)
+	{//控制 拖拽，以免超出画布范围
+		//每次只需把拖动的增量 加到画布原点偏移量中，
+		slsx=tmpx;
+		slider();
+	}
+	
+	mx=e.deltaX;//记录前一次拖动的偏移量
+   //document.getElementById("blText").value = "X偏移量：【" + e.deltaX + "】，Y偏移量：【" + e.deltaY + "】<br />";
+   //控制台输出
+});
+
+hammerul.on("panend", function (e) {
+	mx=0;
+});
+
+
+function slider(){
+	$("#spul").css("left",slsx);
+}
+
+//上面内容为场景图片滑动
+
+var imgindex=-1;//申明 被点击的场景图片为第-1个元素
+
+function dbToLine(rdata){//将line表里的数据存放到line数组里
+	line=[];
+	var l;
+	for(var i=0;i<rdata.length;i++){
+		 var l={startPoint:{x:rdata[i].startx,y:rdata[i].starty},endPoint:{x:rdata[i].endx,y:rdata[i].endy},name:rdata[i].name,len:rdata[i].len,angel:rdata[i].angel,des:rdata[i].des};
+		 line.push(l);
+	}
+	reDraw();
+}
+
+//删除图片
+function delpicfile(rdata){//删除图片文件
+	fs.remove({
+		path : rdata[0].canpicurl
+	}, function(ret, err) {
+		if (ret.status) {
+			//alert("图片删除成功");
+			//alert(JSON.stringify(ret));
+		} else {
+			alert(JSON.stringify(err));
+		}
+	});
+}
+$("#listOpen").click(function(){//在画布上打开该场景图片
+//	1.根据场景图片imgindex，到数组中取出imgid[index]的图片id，
+//	2.根据 id,到line表里取出对应的线条,将该线条数组赋值给line数组
+//	3.然后将线条显示在画布上
+	var canpicid=imgid[imgindex];
+	getLines(canpicid,dbToLine);
+	
+	$("#orderDiv").toggleClass("hidden");//点击打开后，隐藏着两个div
+	$("#swip").toggleClass("hidden");
+});
+$("#listDel").click(function(){//删除该场景图片
+	//1.根据场景图片imgindex，到数组中取出imgid[index]的图片id
+	//2。删除图片文件，
+	//3.删除line表和canpic表里的数据
+	var canpicid=imgid[imgindex];
+	getUrlByid(canpicid,delpicfile);//从数据库取出图片路径，然后删除图片文件
+	delByCanpicid(canpicid);//删除line表里的记录
+	delByid(canpicid);//删除canpic表里的记录
+	//因为场景图片都是从数组里取得，所以还需要对imgs和imgid这两个数组进行操作。同事要刷新场景图片
+	imgs.splice(imgindex,1);//删除一个元素
+	imgid.splice(imgindex,1);
+	
+	$("#spul").empty();
+	$.each(imgs,function(i,n){
+		str="<li><img src='"+n+"' alt='from canvas'/></li>";
+		$("#spul").append(str);
+	});
+	//删除 完成后需要隐藏命令菜单
+	$("#orderDiv").toggleClass("hidden");
+});
+$("#listMdName").click(function(){//修改场景图片名称
+	
+});
+$("#listMdBotPic").click(function(){//更换场景图片底图
+	$("#orderDiv").toggleClass("hidden");
+	$("#swip").toggleClass("hidden");
+	$("#bgpicDiv").toggleClass("hidden");//显示更换场景底图对话框
+});
+/////////////////////更换场景图片 点击事件///////////////////
+function setRedraw(){
+	if(bgsrc){
+		isbgpic=1;		
+	}else{
+		isbgpic=0;
+	}
+	line=[];
+	reDraw();
+}
+$("#bgpicSelect li").click(function(){//底图对话框，1.新打开画布，2更换底图
+	var selIndex=$(this).index();//从0开始
+	switch(selIndex){
+		case 0://无
+			setRedraw();
+			
+			break;
+		case 1://照相机
+			camare(setRedraw);
+			
+			break;
+		case 2://图片
+			scanPic(setRedraw);
+			break;
+	}
+	
+	$("#bgpicDiv").toggleClass("hidden");//关闭场景底图对话框
+});
+//场景图片点击事件
+$("#spul ").on('click','li',function(){//动态添加元素，绑定事件
+	tempindex=$(this).index();//从0开始
+	var offset=$(this).offset();
+	var lileft=offset.left;
+	var dwoffset=$("#swip").offset();
+	var dwleft=dwoffset.left;
+	if((lileft-dwleft+100)>$("#swip").width()){
+		$("#orderDiv").css("left",(dwleft+$("#swip").width()-100));
+	}else if(lileft<dwleft){
+		$("#orderDiv").css("left",dwleft);
+	}else{
+		$("#orderDiv").css("left",lileft);
+	}
+	
+	if( tempindex==0){//新打开画布
+		isbgpic=0,bgsrc='';//新打开画布，则初始化底图数据
+		imgindex=tempindex;
+		$("#swip").toggleClass("hidden");
+		$("#orderDiv").addClass("hidden");
+		$("#bgpicDiv").toggleClass("hidden");//显示更换场景底图对话框
+//		line=[];
+//		reDraw();
+	}else if(tempindex==imgindex){//如果点的是同一张图片，则显示或不显示
+		$("#orderDiv").toggleClass("hidden");
+	}else{//如果点的是不同的图片，则在不同的位置显示
+		imgindex=tempindex-1;
+		$("#orderDiv").removeClass("hidden");
+	}
+	
+});

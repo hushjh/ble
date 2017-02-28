@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	#footerBar{
+    		background-color:#000000;
+    	}
+    	.footbtn{
+    		width:40px;
+    		height:40px;
+    		margin:5px;
+    		background-color:#111111;
+    		border-radius:5px;
+    		border-top:1px solid #fff;
+    		border-right:1px solid #fff;
+    		color:#636363;
+    		text-align:center;
+    		line-height:40px;
+    	}
+    	#bluedata{
+    		color:#000000;
+    		border:3px solid #636363;
+    		background-color: #636363;
+    	}
+    	#bluedata input{
+    		width:99%;
+			height:20px;
+			margin-right:3px;
+			background-color:#ffffff;
+			border:1px solid #636363;
+			border-radius:3px;	
+    	}
+    	#canvas{
+			display: block;
+			background-color:#ECEAE8;
+		}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+			<i class="backBar backIcon"></i>
+			<h1></h1>
+		</div>
+		<div id="main">
+			<canvas id="canvas">
+				你的浏览器不支持canvas
+			</canvas>
+		</div>
+		<div id="bluedata" ><input type="text" placeholder="0"/></div>
+		<div id="footerBar">
+			<div id="draw" class="footbtn">画线</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/win_drawLine.js"></script>
+<script type="text/javascript">
+	
+</script>
+</html>

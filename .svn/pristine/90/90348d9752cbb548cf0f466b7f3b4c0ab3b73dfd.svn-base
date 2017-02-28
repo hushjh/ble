@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" type="text/css" href="./css/common.css" />
+    <style type="text/css">
+    	.linePro{
+    		display:inline-block;
+    		width:39%;
+    		background-color:#FFFFFF;
+    		margin:20px 5% 10px 5%;
+    	}
+    	.project{
+    		display:-webkit-box;
+    		-webkit-box-orient: vertical;
+    	}
+    	.topDiv{
+    		-webkit-box-flex: 1;
+    		border:1px solid #000;
+    	}
+    	.bottomDiv{
+    		height:25px;
+    		text-align:center;
+    		background-color:#FFFF00;
+    		line-height:30px;
+    	}
+    	
+    	.proi{
+    		display:block;
+    		width:30%;
+    		height:30%;
+    		margin:40%;
+    		border:1px solid #000000;
+    		background-size:20px 20px;
+    		background-position:center;
+    		background-repeat:no-repeat;
+    		
+    	}	
+    	.new{
+    		background-image:url("image/add.png");
+    	}
+    
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div id="header">
+            <h1>测距仪</h1>
+        </div>
+        <div id="main">
+	        <div class="linePro">
+	        	<div class="project">
+	        		<div class="topDiv"><i ></i></div>
+	        		<div class="bottomDiv"><span>新建项目</span></div>
+	        	</div>
+	        </div>
+        	 <div class="linePro">
+	        	<div class="project">
+	        		<div class="topDiv"><i ></i></div>
+	        		<div class="bottomDiv"><span>新建项目</span></div>
+	        	</div>
+	        </div>
+	        <div class="linePro">
+	        	<div class="project">
+	        		<div class="topDiv"><i ></i></div>
+	        		<div class="bottomDiv"><span>新建项目</span></div>
+	        	</div>
+	        </div>
+        </div>
+        
+    </div>
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="./script/common.js"></script>
+<script type="text/javascript">
+	apiready = function() {
+		fixStatusBar("header");
+		setDiv();
+	}
+	function setDiv(){
+		var proWidth=$(".project").width();
+		$(".project").height(proWidth);
+		$("i").addClass("proi new");
+	}
+</script>
+</html>

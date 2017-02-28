@@ -1,0 +1,91 @@
+
+
+//获取line表里的所有数据
+function getCans(){
+	var sql = "select * from line ";
+	db.selectSql({
+		name : 'ble',
+		sql : sql
+	}, function(ret, err) {
+		//alert(JSON.stringify(ret));
+		var rdata = ret.data;
+		return rdata;
+	});
+}
+
+//保存canvas上的线条，以及canvas转化成的png格式的图片的url
+function saveCan(line, canpicurl){
+	var startx=line.startPoint.x;
+	var starty=line.startPoint.y;
+	var endx=line.endPoint.x;
+	var endy=line.endPoint.y;
+	var name=line.name;
+	var len=line.len;
+	var angel=line.angel;
+	var des=line.des;
+	var sql = "insert into line(id,startx,starty,endx,endy,name,len,angel,des,canpicurl,bgpicid )values('" + id + "','" + startx + "','" + starty +"','" + endx +"','" + endy +"','" + name +"','" + len +"','" + angel +"','" + des +"','" + canpicurl +"','" + bgpicid +"')";
+
+	db.executeSql({
+		name : 'ble',
+		sql : sql
+	}, function(ret, err) {
+		if (ret.status) {
+			
+			//alert("保存成功！");	
+		} else {
+			api.alert({
+				msg : err.msg
+			});
+		}
+	});
+}
+
+function createTable() {
+	db.openDatabase({
+		name : 'ble'
+	}, function(ret, err) {
+		if (ret.status) {
+			//api.alert({
+				//msg : '数据库打开成功'
+			//});
+			// 创建表（先判断是否存在）
+			var sql1 ='create table if not exists line(id int IDENTITY(1,1) PRIMARY KEY,startx int,starty int,endx int,endy int,name nvarchar(50),len float,angel nvarchar(50),des nvarchar(50),canpicurl nvarchar(50),bgpicid int)';
+			var sql2 ='create table if not exists bgpic(id int IDENTITY(1,1) PRIMARY KEY,bgpicurl nvarchar(50))';
+			db.executeSql({
+				name : 'ble',
+				sql : sql2
+			}, function(ret, err) {
+				if (ret.status) {
+					//api.alert({
+						//msg : '创建company表成功'
+					//});
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+			db.executeSql({
+				name : 'ble',
+				sql : sql1
+			}, function(ret, err) {
+				if (ret.status) {
+					//api.alert({
+						//msg : '创建pic表成功'
+					//});
+					//test();
+					
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+			
+		} else {
+			api.alert({
+				msg : err.msg
+			});
+		}
+	});
+}

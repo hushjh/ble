@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	#mapDiv{
+    		width:90%;
+			height:150px;
+			margin-top:10px;
+			margin-left:5%;
+			background-color:#FFFFFF;
+    	}
+    	.formData{
+    		width:80%;
+    		margin-top:10px;
+    		margin-left:10%;
+    	}
+    	#autoLoc{
+    		background-color:#FFFFFF;
+    		width:100%;
+    		height:40px;
+    		text-align:center;
+    		line-height:40px;
+    		border:1px solid #000000;
+    	}
+    	.divRow{
+    		margin-top:10px;
+    		width:100%;
+    	}
+    	input{
+    		background-color:#FFFFFF;
+    		height:40px;
+    	}
+    	.line{
+    		width:100%;
+    	}
+    	.halfLine{
+    		width:45%;
+    	}
+    	 .halfLine:last-of-type{
+    		margin-left:8%;
+    	}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+		<i class="backBar backIcon"></i>
+		<h1>位置</h1>
+		</div>
+		<div id="main">
+			<div id="mapDiv"></div>
+			<div class="formData">
+				<div id="autoLoc">自动定位</div>
+				<div class="divRow">
+					<input type="text" placeholder="街道" class="line"/>
+				</div>
+				<div class="divRow">
+					<input type="text" placeholder="城市"class="halfLine"/>
+					<input type="text"placeholder="州/省"class="halfLine"/>
+				</div>
+				<div class="divRow">
+					<input type="text" placeholder="国家"class="halfLine"/>
+					<input type="text" placeholder="邮政编码"class="halfLine"/>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		fixStatusBar("header");
+		eleClick();
+	};
+	function eleClick(){
+		backToAddMain();
+		keyBackTOAddMain();
+	}
+</script>
+</html>

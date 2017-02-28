@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <style type="text/css">
+    *{
+    	outline:0;/*当元素获得焦点的时候，焦点框为0*/
+    }
+    html,body{
+        height: 100%;
+    }
+    #wrap{
+        height: 100%;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-flex-flow: column;
+               flex-flow: column;
+    }
+    #header{
+        text-align: center; background-color: #81a9c3; color: #fff;
+        width: 100%;
+        display:-webkit-box;
+    }
+    #header h1{
+    	-webkit-box-flex:1;
+        font-size: 20px; height: 44px; line-height: 44px; margin: 0em; color: #fff;
+    }
+    #main{
+        -webkit-box-flex: 1; 
+        -webkit-flex: 1;
+        flex: 1;
+    }
+    #footer{
+        height: 30px; line-height: 30px;
+        background-color: #81a9c3; 
+        width: 100%;
+        text-align: center;
+    }
+    #footer h5{
+        color: white;
+    }
+    .con{font-size: 28px; text-align: center;}
+    
+    .newRecD{
+    	margin:5px;
+    	height:30px;
+    	line-height:30px;
+    	border:1px solid #81A9C3;
+    }
+    .dlist{
+    	margin:10px 5px;
+    	
+    }
+    .ullist li{
+    	height:30px;
+    	line-height:30px;
+    	border-bottom:1px solid #81A9C3;
+    }
+    .connectHead{
+    	width:30px;
+    	height:30px;
+    	line-height:30px;
+    	text-align:30px;
+    	font-size:12px;
+    	background-color:#aaa;
+    	border-radius:15px;
+    	margin-top:6px;
+    	margin-right:5px;
+    }
+    .blank{
+    	width:30px;
+    }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div id="header">
+        	<div class="blank" onclick="connect()"></div>
+            <h1>蓝牙配对测试</h1>
+            <div class="connectHead" onclick="scan()">连接</div>
+        </div>
+        <div id="main">
+        	<div class="newRecD"><span class="newRecS" id="newRecSid"></span></div>
+        	<div class="dlist">
+	        	<ul class="ullist" id="ullistid">
+		        	
+	        	</ul>
+        	</div>
+        </div>
+        
+        
+    </div>
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="./script/common.js"></script>
+<script type="text/javascript">
+	var uuids=[];//所有的设备信息
+	var servuuids=[];
+	var cuuids=[];//所有的特征uuid
+	var desuuids=[];//所有的描述符uuid
+	var uuid;//设备uuid
+	var servuuid;//服务uuid
+	var cuuid;//特征uuid
+	var desuuid;//描述符uuid
+	var uuidNum,servuuidNum,cuuidNumN;
+	var recs=[];//所有的距离记录;
+    apiready = function(){
+		ble = api.require('ble');
+		var systemType = api.systemType;
+		var systemVersion = parseFloat(api.systemVersion);
+		fixStatusBar("header");
+		if(systemType == "ios" && systemVersion >= 6.0)
+		{
+			uuidNum=0;
+			servuuidNum=0;
+			cuuidNumN=0;
+			initmg();
+		}else if(systemType == "android" && systemVersion >= 4.4){
+			uuidNum=0;
+			servuuidNum=2;
+			cuuidNumN=0;
+			initmg();
+		}
+		
+		//showRec("123456");
+    };
+    //初始化蓝牙4.0管理器
+    function initmg(){
+    	ble.initManager(function(ret){
+		  if(ret.state == "poweredOn"){//蓝牙4.0设备连接状态,设备开启状态 -- 可用状态
+		    //api.alert({msg:"初始化成功"});
+		    scan();
+		  }
+		});
+    }
+    //停止扫描
+    function stopscan(){
+    	ble.stopScan();
+    }
+    //开始扫描
+    function scan(){
+    	ble.scan({
+		   serviceUUIDs:[]
+		}, function( ret ){
+		    if( ret.status ){
+		        //alert( '开始扫描' );
+		        getInfo();
+		    }
+		});
+    }
+    function getInfo(){//获取扫描到的设备的信息
+    	ble.getPeripheral( function( ret ){
+    		//api.alert( "getInfo:"+{msg:JSON.stringify( ret )} );
+		    if( ret ){
+		        uuids=ret.peripherals; 
+		        connect();
+		    }
+		});
+    }
+    function connect(){//根据uuid 链接设备
+    	uuid=uuids[uuidNum].uuid;
+    	if(typeof(uuid)==undefined)
+    	{
+    		return ;
+    	}
+    	ble.connect({
+		    peripheralUUID: uuid
+		},function(ret,err){
+			//api.alert("connect:"+ {msg:JSON.stringify( ret )} );
+		   if(ret.status) {
+		       alert("连接成功！");
+		       disServ();
+		   } else {
+		      alert(err.code);
+		   }
+		});
+    }
+    function disServ(){//根据uuid  找到所有服务，
+    	ble.discoverService({
+		    peripheralUUID: uuid
+		},function(ret){
+		   if(ret) {
+		       //api.alert( {msg:JSON.stringify( ret )} );
+		       servuuids=ret.services;
+		      disCharac();
+		   } 
+		});
+    }
+    function disCharac(){
+    	
+    	servuuid=servuuids[servuuidNum];
+    	ble.discoverCharacteristics({//找到特征uuid
+		    peripheralUUID: uuid,
+		    serviceUUID:servuuid
+		},function(ret){
+		   if(ret) {
+		       //api.alert( {msg:JSON.stringify( ret )} );
+		       cuuids=ret.characteristics;
+		       //
+		       setNo();
+		   } 
+		});
+    }
+    function setNo(){//监听收到的值
+    	
+    	cuuid=cuuids[cuuidNumN].uuid;//描述符uuid
+    	ble.setNotify({
+		    peripheralUUID: uuid,
+		    serviceUUID: servuuid,
+		    characteristicUUID: cuuid
+		},function(ret){
+		   if(ret) {
+		       //api.alert( {msg:JSON.stringify( ret )} );
+		       changeData(ret.characteristic.value);
+		       //alert("value:"+parseInt(ret.characteristic.value,16));
+		   } 
+		});
+    }
+    //将测距的数据转换
+    function changeData(sdata){
+    	if(sdata.substring(5,6)=="5"){
+    		var ddata=sdata.substring(11,12)+sdata.substring(13,14)+"."+sdata.substring(17,18)+sdata.substring(19,20)+sdata.substring(21,22)+"m";
+    	}else{
+    		var ddata=sdata.substring(11,12)+"."+sdata.substring(15,16)+sdata.substring(17,18)+sdata.substring(19,20)+"m";
+    	}
+    	//alert(ddata);
+    	
+    	recs.push(ddata);
+    	showRec(ddata);
+    	return ddata;
+    }
+    //页面上展示距离记录
+    function showRec(ddata){
+    	//alert("showRec:"+ddata);
+    	$("#ullistid").append("<li>"+ddata+"</li>");
+    	document.getElementById("newRecSid").innerHTML=ddata;	
+    }
+ 
+</script>
+</html>

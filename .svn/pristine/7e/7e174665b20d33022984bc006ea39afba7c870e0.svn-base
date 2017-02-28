@@ -1,0 +1,59 @@
+
+var imgs=[];
+
+// Converts canvas to an image
+function convertCanvasToImage(canvas) {
+
+	var dataUrl = canvas.toDataURL("image/png");
+	imgs.push(dataUrl);
+	alert("dataUrl:" + dataUrl);
+	var pos = dataUrl.indexOf(',');
+	if (pos > 0) {
+		var data = dataUrl.substring(pos + 1);
+		trans.saveImage({
+			base64Str : data,
+			imgPath : 'fs://image/',
+			imgName : 'detail.png',
+			album : false
+		}, function(ret, err) {
+			if (ret.status) {
+				alert("保存成功");
+				imgTobase64();
+			} else {
+				api.alert({
+					msg : err.msg
+				});
+			}
+		});
+	}
+	return dataUrl;
+}
+
+function imgTobase64(){
+	trans.decodeImgToBase64({
+	    imgPath: 'fs://image/detail.png'
+	}, function(ret, err){        
+	    if( ret.status ){
+	        //alert( JSON.stringify( ret ) );
+	        trans.saveImage({
+				base64Str : ret. base64Str,
+				imgPath : 'fs://image/',
+				imgName : 'detail1.png',
+				album : false
+			}, function(ret, err) {
+				if (ret.status) {
+					//alert(JSON.stringify(ret));
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+	    }else{
+	        alert( JSON.stringify( err ) );
+	    }
+	});
+}
+
+
+

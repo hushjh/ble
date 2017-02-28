@@ -1,0 +1,143 @@
+
+
+//获取line表里的同一张图片里的线条
+function getLines(canpicid){
+	var sql = "select * from line where canpicid="+canpicid;
+	db.selectSql({
+		name : 'ble',
+		sql : sql
+	}, function(ret, err) {
+		//alert(JSON.stringify(ret));
+		var rdata = ret.data;
+		return rdata;
+	});
+}
+
+//获取canpic里的所有图片
+function getCanpics(){
+	var sql = "select * from canpic ";
+	db.selectSql({
+		name : 'ble',
+		sql : sql
+	}, function(ret, err) {
+		//alert("getCanpic:"+ret.data.length); 
+		return ret.data;
+	});
+}
+
+//先保存图片的url，然后将每一张图片的id给线条,具有相同图片id 的则是同一张画布里的
+function saveimg(line,canpicurl){
+	var sql1="insert into canpic(canpicurl)values('" + canpicurl + "')";
+	var sql2="select * from canpic order by id desc limit 1";
+	db.executeSql({
+		name : 'ble',
+		sql : sql1
+	}, function(ret, err) {
+		if (ret.status) {
+			db.selectSql({
+				name : 'ble',
+				sql : sql2
+			}, function(ret, err) {
+				//alert("canpic select:"+JSON.stringify(ret));
+				var rdata = ret.data;//[]
+				saveNewPic({id:rdata[0].id,canpicurl:rdata[0].canpicurl});//将新保存的图片存入数据库的同时，存入数组中
+				saveCan(line,rdata[0].id);
+				return rdata;
+			});
+			//alert("保存成功！");	
+		} else {
+			api.alert({
+				msg : err.msg
+			});
+		}
+	});
+}
+//保存canvas上的线条，以及canvas转化成的png格式的图片的url
+function saveCan(line, canpicid){
+	
+	for(var i=0;i<line.length;i++){
+		var startx=line[i].startPoint.x;
+		var starty=line[i].startPoint.y;
+		var endx=line[i].endPoint.x;
+		var endy=line[i].endPoint.y;
+		var name=line[i].name;
+		var len=line[i].len;
+		var angel=line[i].angel;
+		var des=line[i].des;
+		var bgpicid='';
+		
+		var sql = "insert into line(startx,starty,endx,endy,name,len,angel,des,canpicid,bgpicid )values('" + startx + "','" + starty +"','" + endx +"','" + endy +"','" + name +"','" + len +"','" + angel +"','" + des +"','" + canpicid +"','" + bgpicid +"')";
+		db.executeSql({
+			name : 'ble',
+			sql : sql
+		}, function(ret, err) {
+			if (ret.status) {
+				
+				//alert("保存成功！");	
+			} else {
+				api.alert({
+					msg : err.msg
+				});
+			}
+		});
+	}
+	
+}
+
+function createTable() {
+	db.openDatabase({
+		name : 'ble'
+	}, function(ret, err) {
+		if (ret.status) {
+			//api.alert({
+				//msg : '数据库打开成功'
+			//});
+			// 创建表（先判断是否存在）
+			var sql1 ='create table if not exists line(id INTEGER PRIMARY KEY AUTOINCREMENT,startx int,starty int,endx int,endy int,name nvarchar(50),len float,angel nvarchar(50),des nvarchar(50),canpicid int,bgpicid int)';
+			var sql2 ='create table if not exists bgpic(id INTEGER PRIMARY KEY AUTOINCREMENT,bgpicurl nvarchar(50))';
+			var sql3 ='create table if not exists canpic(id INTEGER PRIMARY KEY AUTOINCREMENT,canpicurl nvarchar(50))';
+			db.executeSql({
+				name : 'ble',
+				sql : sql2
+			}, function(ret, err) {
+				if (ret.status) {
+					//api.alert({
+						//msg : '创建company表成功'
+					//});
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+			db.executeSql({
+				name : 'ble',
+				sql : sql1
+			}, function(ret, err) {
+				if (ret.status) {
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+			
+			db.executeSql({
+				name : 'ble',
+				sql : sql3
+			}, function(ret, err) {
+				if (ret.status) {
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+			
+		} else {
+			api.alert({
+				msg : err.msg
+			});
+		}
+	});
+}

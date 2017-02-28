@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	 p{text-indent:2em} 
+    	.topbar_tit{
+    		display:block;
+    		font-size:18px;
+    		text-align:left;
+    		line-height:40px;
+    		margin-left:4%;
+    	}
+    	#main{
+    		background-color:#EaEAEa;
+    	}
+    	.func_list{
+    		margin:15px;
+    		color:#ffffff;
+    		font-size:20px;
+    	}
+    	.resume_content{
+    		margin:20px 5px;
+    		color:#000000;
+    	}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+			<i class="backBar backIcon_gray"></i>
+			<span class="topbar_tit">公司简介</span>
+		</div>
+		
+		<div id="main">
+			<p class="resume_content">常州华达科捷光电仪器有限公司是一家专业从事光机电一体化激光测量和测控以及智能化工程控制系统的研发和制造的高新技术企业，落户于江苏省常州市钟楼经济开发区梅花路16号。
+　　			</p>
+			<p class="resume_content">公司主要产品包括各种激光测量仪器和自动激光扫平仪、自动激光投线仪等高精度仪器，工程机械自动控制、工业测定和检测软件，电子水平、倾角传感器光电仪器重要组件，高精度仪器配套附件，各种平面和球面以及自由曲面光学元件的设计和深加工服务等。</p>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		
+	};
+	
+	//头部返回导航
+$(".backIcon_gray").click(function(){
+	api.openWin({
+		name : 'index',
+		url : '../index.html',
+	});
+});
+</script>
+</html>

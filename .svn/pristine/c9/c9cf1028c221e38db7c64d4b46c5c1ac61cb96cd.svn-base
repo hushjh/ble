@@ -1,0 +1,50 @@
+body {
+
+}
+#swip{
+	width:90%;
+	height:200px;
+	position:fixed;
+	right:5%;
+	top:200px;
+	background-color:#000000;
+	overflow:hidden;/*隐藏div 溢出部分*/
+}
+
+#spul{
+	display:-webkit-box;
+	margin:5px 0;
+	position:absolute;
+}
+#spul li{
+	margin-left:5px;
+}
+#spul li img{
+	height:190px;
+	width:100px;
+}
+
+
+/*上边是滑动图片的css ，下边是点击图片后弹出的菜单*/
+#orderDiv{
+	width:100px;
+	position:fixed;
+	top:400px;
+	background-color:#000000;
+	color:#FFFFFF;
+}
+#orderList li{
+	padding-left:10px;
+	height:40px;
+	line-height:40px;
+	color:#FFFFFF;
+	font-size:18px;
+}
+#orderList li:not(:last-child){
+	border-bottom: 1px solid #636363;
+}
+
+
+
+
+

@@ -1,0 +1,74 @@
+
+var imgs=[];
+var saveFile = function(data, filename) {
+	var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+	save_link.href = data;
+	save_link.download = filename;
+
+	var event = document.createEvent('MouseEvents');
+	event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+	save_link.dispatchEvent(event);
+};
+
+// Converts canvas to an image
+function convertCanvasToImage(canvas) {
+
+	//var image = new Image();
+	//var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+	//将mime-type改为image/octet-stream，强制让浏览器直接download
+	//var w=window.open('about:blank','image from canvas');
+	//w.document.write("<img src='"+image+"' alt='from canvas'/>");
+	//window.location.href=image;
+	var dataUrl = canvas.toDataURL("image/png");
+	//alert("dataUrl:" + dataUrl);
+	var pos = dataUrl.indexOf(',');
+	if (pos > 0) {
+		var data = dataUrl.substring(pos + 1);
+		trans.saveImage({
+			base64Str : data,
+			imgPath : 'fs://image/',
+			imgName : 'detail.png',
+			album : false
+		}, function(ret, err) {
+			if (ret.status) {
+				alert("保存成功");
+				imgs.push(data);
+			} else {
+				api.alert({
+					msg : err.msg
+				});
+			}
+		});
+	}
+	
+	trans.decodeImgToBase64({
+	    imgPath: 'widget://res/list.png'
+	}, function(ret, err){        
+	    if( ret.status ){
+	        //alert( JSON.stringify( ret ) );
+	        trans.saveImage({
+				base64Str : ret. base64Str,
+				imgPath : 'fs://image/',
+				imgName : 'test.png',
+				album : false
+			}, function(ret, err) {
+				if (ret.status) {
+					alert(JSON.stringify(ret));
+				} else {
+					api.alert({
+						msg : err.msg
+					});
+				}
+			});
+	    }else{
+	        alert( JSON.stringify( err ) );
+	    }
+	});
+
+	//			// 下载后的问题名
+	//
+	//	var filename = 'baidufe_' + (new Date()).getTime() + '.' + 'png';
+	//	// download
+	//	saveFile(image,filename);
+	return dataUrl;
+}

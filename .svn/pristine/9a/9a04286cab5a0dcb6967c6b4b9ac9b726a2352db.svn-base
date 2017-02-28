@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+     <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	.btn{
+    		width:80%;
+    		height:40px;
+    		margin-top:20px;
+    		margin-left:10%;
+    		text-align: center;
+    		line-height:40px;
+    	}
+    	#loginIn{
+    		background-color:blue;
+    		margin-top:100px;
+    	}
+    	#regist{
+    		background-color:#FFFFFF;
+    	}
+    </style>
+    
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+		<i class="backBar backIcon"></i>
+		<h1>我的账户</h1>
+		</div>
+		<div id="main">
+			<div id="loginIn" class="btn">立即登录</div>
+			<div id="regist" class="btn">免费注册</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		fixStatusBar(headerid);
+		eleClick();
+	};
+	function eleClick(){
+		backToAddMain();
+		keyBackTOAddMain();
+	}
+</script>
+</html>

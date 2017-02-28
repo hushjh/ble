@@ -1,0 +1,74 @@
+//打开本地媒体资源
+function scanPic() {
+	var UIMediaScanner = api.require('UIMediaScanner');
+	UIMediaScanner.open({
+		type : 'picture',
+		column : 4,
+		classify : true,
+		max : 1,
+		sort : {
+			key : 'time',
+			order : 'desc'
+		},
+		texts : {
+			stateText : '已选择*项',
+			cancelText : '取消',
+			finishText : '完成'
+		},
+		styles : {
+			bg : '#fff',
+			mark : {
+				icon : '',
+				position : 'bottom_left',
+				size : 20
+			},
+			nav : {
+				bg : '#eee',
+				stateColor : '#000',
+				stateSize : 18,
+				cancelBg : 'rgba(0,0,0,0)',
+				cancelColor : '#000',
+				cancelSize : 18,
+				finishBg : 'rgba(0,0,0,0)',
+				finishColor : '#000',
+				finishSize : 18
+			}
+		},
+		scrollToBottom : {
+			intervalTime : 3,
+			anim : true
+		},
+		exchange : true,
+		rotation : true
+	}, function(ret) {
+		if (ret) {
+			//alert(JSON.stringify(ret));
+			alert("ret.list[0].path:"+ret.list[0].path);
+			bgsrc=ret.list[0].path;
+		}
+	});
+}
+
+//拍照
+function camare() {
+	api.getPicture({
+		sourceType : "camera",
+		encodingType : "jpg",
+		destinationType : "url",
+		mediaValue : "pic",
+		quality : 50,
+		saveToPhotoAlbum : true
+	}, function(ret, err) {
+		if (ret && ret.data) {
+			// 拍照返回的本地路径
+			var returnUrl = ret.data;
+			// 图片压缩
+			alert("returnUrl:"+returnUrl);
+			ret.list[0].path=returnUrl;
+		} else {
+			api.toast({
+				msg : '没有选择，或者选择出错'
+			});
+		}
+	});
+}

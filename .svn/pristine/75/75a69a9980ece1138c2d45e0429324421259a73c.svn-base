@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	ul{
+    		width:100%;
+			margin-top:10px;
+			border-top:1px solid #000000;
+			background-color:#ECEAE8;
+    	}
+    	li{
+    		width:100%;
+			height:60px;
+			border-bottom: 1px solid #000000;
+    	}
+    	.leftIcon{
+    		display:inline-block;
+    		width:30px;
+    		height:30px;
+    		margin-top:15px;
+    		margin-left:15px;
+    		background-size:30px;
+    		background-position:center;
+    		background-repeat:no-repeat;
+    	}
+    	.rightContent{
+    		display:inline-block;
+    		margin-left:10px;
+    	}
+    	.topcon{
+    		font-size:20px;
+    		font-weight:900;
+    		
+    	}
+    	.bottomcon{
+    	}
+    </style>
+   
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+		<i class="backBar backIcon"></i>
+		<h1>添加元素</h1>
+		</div>
+		<div id="main">
+			<ul>
+				<li>
+					<i class="leftIcon cameraIcon"></i>
+					<div class="rightContent">
+						<span class="topcon">捕捉</span><br>
+						<span class="bottomcon">使用相机捕捉房间</span>
+					</div>
+				</li>
+				<li id="drawLine">
+					<i class="leftIcon drawLineIcon"></i>
+					<div class="rightContent">
+						<span class="topcon" >画图</span><br>
+						<span class="bottomcon">通过自由绘制方式来绘制一个房间</span>
+					</div>
+				</li>
+				<li>
+					<i class="leftIcon importPicIcon"></i>
+					<div class="rightContent">
+						<span class="topcon">导入图库</span><br>
+						<span class="bottomcon">导入手机文件中的图片</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		fixStatusBar("header");
+		eleClick();
+	};
+	function eleClick(){
+		$(".backIcon").click(function(){
+			api.openWin({
+		        name: 'win_newProMain',
+		        url: 'win_newProMain.html'
+	        });
+	       api.closeFrame(); 
+		});
+		$("#drawLine").click(function(){
+			api.openWin({
+	            name: 'win_drawLine',
+	            url: 'win_drawLine.html'
+            });
+		});
+	}
+</script>
+</html>

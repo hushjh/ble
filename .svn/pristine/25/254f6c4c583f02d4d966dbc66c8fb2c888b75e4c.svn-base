@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	.topbar_tit{
+    		display:block;
+    		font-size:18px;
+    		text-align:left;
+    		line-height:40px;
+    		margin-left:5%;
+    	}
+    	#main{
+    		background-color:#000000;
+    	}
+    	.func_list{
+    		margin:15px;
+    		color:#ffffff;
+    		font-size:20px;
+    	}
+    	#wrap{
+    		background-color:#000000;
+    	}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+			<i class="backBar backIcon_gray"></i>
+			<span class="topbar_tit">产品动态</span>
+		</div>
+		
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		UIScrollPicture = api.require('UIScrollPicture');
+		openScrPic();
+		
+	};
+	
+	//打开轮播图
+	function openScrPic(){
+		var w=api.winWidth;
+		var h=api.winHeight;
+		UIScrollPicture.open({
+		    rect: {
+		        x: 2,
+		        y: 40,
+		        w: w-4,
+		        h: h-42
+		    },
+		    data: {
+		        paths: ['widget://image/product/product1.png', 'widget://image/product/product2.png', 'widget://image/product/product3.png'],
+		        captions: []
+		    },
+		    styles: {
+		        caption: {
+		            height: 35,
+		            color: '#E0FFFF',
+		            size: 13,
+		            bgColor: '#696969',
+		            position: 'bottom'
+		        },
+		        indicator: {
+		            align: 'center',
+		            color: '#FFFFFF',
+		            activeColor: '#DA70D6'
+		        }
+		    },
+		    placeholderImg: 'widget://image/product/product1.png',
+		    contentMode: 'scaleToFill',
+		    auto:false,
+		    interval: 3,
+		    loop: false,
+		    fixed: false
+		},function( ret, err ){
+		    if( ret ){
+		         //alert( JSON.stringify( ret ) );
+		    }else{
+		         alert( JSON.stringify( err ) );
+		    }
+		});
+	}
+	
+	//头部返回导航
+$(".backIcon_gray").click(function(){
+	api.openWin({
+		name : 'index',
+		url : '../index.html',
+	});
+});
+</script>
+</html>

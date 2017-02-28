@@ -1,0 +1,72 @@
+
+var imgpath="fs://image/";
+var imgs=[];
+var imgid=[];
+
+//将数据库里的所有canvas 图片取出来放在数组中
+function dbToarray(){
+	var rdata=getCanpics();
+	if(!rdata){
+		return;
+	}
+	var str="data:image/png;base64,";
+	for(var i=0;i<rdata.length;i++){
+		var img64=str+imgTobase64(rdata[i].canpicurl);
+		imgs.push(img64);
+		imgid.push(rdata[i].id);
+	}
+}
+
+//新保存一张图片,数组新加元素
+function saveNewPic(id,canpicurl){
+	alert("canpicurl:"+canpicurl);
+	var str="data:image/png;base64,";
+	var img64=str+imgTobase64(canpicurl);
+	imgs.push(img64);
+	imgid.push(id);
+}
+// Converts canvas to an image点保存按钮后，保存画布上的线条到数据库，同事将画布转化成图片
+function convertCanvasToImage(canvas) {
+
+	var imgname=Date.now()+'.png';
+	var dataUrl = canvas.toDataURL("image/png");
+	//alert("dataUrl:" + dataUrl);
+	//str="data:image/png;base64,"
+	var pos = dataUrl.indexOf(',');
+	if (pos > 0) {
+		var data = dataUrl.substring(pos + 1);
+		trans.saveImage({
+			base64Str : data,
+			imgPath : imgpath,
+			imgName : imgname,
+			album : false
+		}, function(ret, err) {
+			if (ret.status) {
+				alert("保存成功");
+				saveimg(line,imgpath+imgname);
+				
+			} else {
+				api.alert({
+					msg : err.msg
+				});
+			}
+		});
+	}
+	return dataUrl;
+}
+
+function imgTobase64(url){
+	trans.decodeImgToBase64({
+	    imgPath: url
+	}, function(ret, err){        
+	    if( ret.status ){
+	        //alert( JSON.stringify( ret ) );
+	        return ret.base64Str;
+	    }else{
+	        alert( JSON.stringify( err ) );
+	    }
+	});
+}
+
+
+

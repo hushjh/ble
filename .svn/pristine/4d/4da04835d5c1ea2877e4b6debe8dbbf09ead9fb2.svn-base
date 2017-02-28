@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	.topbar_tit{
+    		display:block;
+    		font-size:18px;
+    		text-align:left;
+    		line-height:40px;
+    		margin-left:30%;
+    	}
+    	#main{
+    		background-color:#000000;
+    	}
+    	.func_list{
+    		margin:15px;
+    		color:#ffffff;
+    		font-size:20px;
+    	}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+			<i class="backBar back_lineIcon"></i>
+			<span class="topbar_tit">公司简介</span>
+		</div>
+		
+		<div id="main">
+			
+			
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="./script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		
+	};
+	
+	//头部返回导航
+$(".back_lineIcon").click(function(){
+	api.openWin({
+		name : 'index',
+		url : '../index.html',
+	});
+});
+</script>
+</html>

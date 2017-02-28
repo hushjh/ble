@@ -1,0 +1,268 @@
+var uuids = [];
+//所有的设备信息
+var servuuids = [];
+var cuuids = [];
+//所有的特征uuid
+var desuuids = [];
+//所有的描述符uuid
+var uuid='';
+//设备uuid
+var servuuid;
+//服务uuid
+var cuuid='';
+//特征uuid
+var desuuid;
+//描述符uuid
+var uuidNum, servuuidNum, cuuidNumN;
+var recs = [];
+//所有的距离记录;
+
+
+//初始设置
+function iniset(){
+	var systemType = api.systemType;
+	var systemVersion = parseFloat(api.systemVersion);
+	//fixStatusBar("header");
+	if (systemType == "ios" && systemVersion >= 6.0) {
+		uuidNum = 0;
+		servuuidNum = 0;
+		cuuidNumN = 0;
+		
+		//initmg();
+	} else if (systemType == "android" && systemVersion >= 4.4) {
+		uuidNum = 0;
+		servuuidNum = 4;
+		cuuidNumN = 1;
+		
+		//initmg();
+		//doby 0,2,0
+	}
+	//connectCheck();
+	ble.initManager(function(ret) {
+		if (ret.state == "poweredOn") {//蓝牙4.0设备连接状态,设备开启状态 -- 可用状态
+			//api.alert({msg:"初始化成功"});
+			scan();
+		}else{
+			alert("蓝牙未开启");
+		}
+	});
+	//setInterval(circleNo,1000*30);
+	
+}
+
+//如果连上了测距仪则 执行数据监听
+function circleNo(){
+	if(cuuid==''){
+		//alert("uuid:"+uuid+",servuuid:"+servuuid+",cuuid:"+cuuid);
+	}else{
+		//alert("uuid:"+uuid+",servuuid:"+servuuid+",cuuid:"+cuuid);
+		setNo();
+	}
+}
+
+//检测蓝牙连接状态，来改变蓝牙连接图标
+function connectCheck(){
+	var isno=false;
+	ble.isConnected({
+	    peripheralUUID: uuid
+	}, function(ret) {
+	    if (ret) {
+	        alert('已连接');
+	        isno=true;
+	    }else{
+	    	isno=false;
+	    	alert("连接断开");
+	    }
+	});
+	//return isno;
+}
+//初始化蓝牙4.0管理器
+function initmg() {
+	
+	ble.initManager(function(ret) {
+		if (ret.state == "poweredOn") {//蓝牙4.0设备连接状态,设备开启状态 -- 可用状态
+			api.alert({msg:"初始化成功"});
+			scan();
+		}else{
+			
+		}
+	});
+}
+
+//停止扫描
+function stopscan() {
+	ble.stopScan();
+}
+
+//开始扫描
+function scan() {
+	ble.scan({
+		serviceUUIDs : []
+	}, function(ret,err) {
+	alert("scan: ret:"+JSON.stringify(ret)+",err:"+JSON.stringify(err));
+		if (ret.status) {
+			alert( '开始扫描' );
+			 //setInterval("getInfo()",2000);
+			getInfo();
+		}else{
+			alert("请开启蓝牙");
+		}
+	});
+}
+
+function getInfo() {//获取扫描到的设备的信息
+	ble.getPeripheral(function(ret,err) {
+		//api.alert( "getInfo:"+{msg:JSON.stringify( ret )} );
+		alert("getInfo:ret:"+JSON.stringify(ret)+",err:"+JSON.stringify(err));
+		if (ret) {
+			uuids = ret.peripherals;
+			if(!uuids.length){
+				alert("没有可连接的设备");
+				
+			}else{
+				connect();
+			}
+		}else{
+			
+		}
+	});
+}
+
+function connect() {//根据uuid 链接设备
+	uuid = uuids[uuidNum].uuid;
+	uuid="F0:C7:7F:44:B0:56";
+	if ( typeof (uuid) == undefined) {
+		return;
+	}
+	ble.connect({
+		peripheralUUID : uuid
+	}, function(ret, err) {
+		api.alert("connect:"+ {msg:JSON.stringify( ret )} );
+		
+		if (ret.status) {
+			//alert("连接成功！");
+			disServ();
+		} else {
+			//alert(err.code);
+			
+		}
+	});
+}
+
+function disServ() {//根据uuid  找到所有服务，
+	ble.discoverService({
+		peripheralUUID : uuid
+	}, function(ret) {
+		if (ret) {
+			api.alert( {msg:JSON.stringify( ret )} );
+			servuuids = ret.services;
+			disCharac();
+		}else{
+			
+		}
+	});
+}
+
+function disCharac() {
+
+	servuuid = servuuids[servuuidNum];
+	ble.discoverCharacteristics({//找到特征uuid
+		peripheralUUID : uuid,
+		serviceUUID : servuuid
+	}, function(ret,err) {
+		alert("disCharac,ret:"+JSON.stringify(ret)+",err:"+JSON.stringify( err ));
+		if (ret) {
+			//api.alert( {msg:JSON.stringify( ret )} );
+			cuuids = ret.characteristics;
+			//
+			blueChange(true);
+			setNo();
+			
+			//setSimpleNo();
+		}else{
+			
+		}
+	});
+}
+
+function setNo() {//监听收到的值
+	//alert("setNo");
+	cuuid = cuuids[cuuidNumN].uuid;
+	//描述符uuid
+	ble.setNotify({
+		peripheralUUID : uuid,
+		serviceUUID : servuuid,
+		characteristicUUID : cuuid
+	}, function(ret,err) {
+		alert("setNotify,ret:"+JSON.stringify( ret )+",err:"+JSON.stringify( err ));
+		if (ret) {
+			changeData(ret.characteristic.value);
+			//isno=true;
+			//blueChange(isno);
+			//alert("value:"+parseInt(ret.characteristic.value,16));
+			
+		}else{
+			
+		}
+	});
+}
+
+function setSimpleNo(){
+	cuuid = cuuids[cuuidNumN].uuid ;
+	ble.setSimpleNotify({
+	    peripheralUUID: uuid,
+	    serviceUUID: servuuid,
+	    characteristicUUID: cuuid
+	}, function(ret, err) {
+		alert("simpleNotify:"+JSON.stringify(ret));
+	    if (!ret.status) {
+	        api.alert({ msg: JSON.stringify(err) });
+	    }
+});
+}
+
+//将测距的数据转换
+function changeData(sdata) {
+	if (sdata.substring(5, 6) == "5") {
+		var ddata = sdata.substring(11, 12) + sdata.substring(13, 14) + "." + sdata.substring(17, 18) + sdata.substring(19, 20) + sdata.substring(21, 22) + "m";
+	} else {
+		var ddata = sdata.substring(11, 12) + "." + sdata.substring(15, 16) + sdata.substring(17, 18) + sdata.substring(19, 20) + "m";
+	}
+	//alert(ddata);
+
+	//recs.push(ddata);
+	showRec(ddata);
+	
+	if(delIndex!=-1){
+		line[delIndex].len=ddata;
+		reDraw();
+	}
+	return ddata;
+}
+
+//页面上展示距离记录
+function showRec(ddata) {
+	//alert("showRec:"+ddata);
+	//$("#ullistid").append("<li>" + ddata + "</li>");
+	//document.getElementById("newRecSid").innerHTML = ddata;
+	var d1=$("#blText1").val();
+	var d2=$("#blText2").val();
+	var d3=$("#blText3").val();
+	d1=d2,d2=d3,d3=ddata;
+	$("#blText1").val(d1);
+	$("#blText2").val(d2);
+	$("#blText3").val(d3);
+}
+
+function blueChange(bflag){
+	if(bflag){
+		$("#linkble").removeClass("blue_p");
+		$("#linkble").addClass("blue_p_active");
+	}else{
+		$("#linkble").removeClass("blue_p_active");
+		$("#linkble").addClass("blue_p");
+	}
+}
+
+
+

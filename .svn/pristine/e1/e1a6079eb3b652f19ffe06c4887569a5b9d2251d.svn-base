@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/win_drawLine.css">
+    <link rel="stylesheet" type="text/css" href="../css/swip.css">
+    <style>
+    	
+		
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header" >
+			<div class="home active">
+				<i class="backBar back_lineIcon"></i>
+				<div id="scene" class="redBotIcon">场景1</div>
+				<div id="uspan">单位</div>
+				<div id="unit" class="greyBotIcon">m</div>
+			</div>
+			<div class="del">
+				<i id ="oki" class="topBtn okIcon"></i>
+				<i id="listi" class="topBtn listIcon"></i>
+				<i id="rubishi" class="topBtn rubishIcon"></i>
+			</div>
+		</div>
+		<div id="listMode" class="hidden">
+			<div class="row"><input type="text" placeholder="名称" id="name"><div class="bottomLine active"></div></div>
+			<div class="row"><input type="text" placeholder="长度" id="len"><div class="bottomLine"></div></div>
+			<div class="row"><input type="text" placeholder="角度" id="angel"><div class="bottomLine"></div></div>
+			<div class="row"><input type="text" placeholder="描述" id="des"><div class="bottomLine"></div></div>
+			<div class="row_btn">
+				<div id="cancel" class="btn">取消</div>
+				<div id="sure" class="btn">确定</div>
+			</div>
+		</div>
+		<div id="main">
+			<canvas id="canvas">
+				你的浏览器不支持canvas
+			</canvas>
+		</div>
+		<div id="bluedata" >
+			<input type="text" placeholder="0" id="blText1" onfocus=this.blur() />
+			<input type="text"  id="blText2" onfocus=this.blur() />
+			<input type="text"  id="blText3" onfocus=this.blur() />
+		</div>
+		<div id="footerBar">
+			<div id="draw" class="footbtn">画线</div>
+			<div id="linkble" class="footbtn ac">连接</div>
+			<div id="backdraw" class="footbtn ac">回退</div>
+			<div id="beforedraw" class="footbtn ac">前进</div>
+			<div id="saveToImage" class="footbtn ac">保存</div>
+		</div>
+	</div>
+	<div id="swip" class="hidden">	
+		<ul id="spul">
+			<!--<li><img src="widget://res/list.png"/></li>
+			<li><img src="widget://res/detail.png"/></li>-->
+			<li><img src="../image/list.png"/></li>
+			<li><img src="fs://image/test.png"/></li>
+			<li><img src="fs://image/detail.png"/></li>
+			<li><img src="../iamge/rubish.png"/></li>
+		</ul>
+	</div>
+	<div id="orderDiv" class="hidden">
+		<ul id=orderList>
+			<li id="listOpen">打开</li>
+			<li id="listDel">删除</li>
+			<li id="listMdName">修改名称</li>
+			<li id="listMdBotPic">更换底图</li>
+		</ul>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/zepto.min.js"></script>
+<script type="text/javascript" src="../script/hammer.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/bleMag.js"></script>
+<script type="text/javascript" src="../script/canvasToImage.js"></script>
+<script type="text/javascript" src="../script/win_drawLine.js"></script>
+<script type="text/javascript" src="../script/swip.js"></script>
+
+<script type="text/javascript">
+	
+</script>
+</html>

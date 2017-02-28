@@ -1,0 +1,91 @@
+var groupIsOpen=0;//窗口组没打开
+apiready = function() {
+	fixStatusBar("header");
+	eleClick();
+	openFg();
+};
+
+function openFg() {
+	api.openFrameGroup({
+		name : 'group1',
+		background : '#fff',
+		scrollEnabled : true,
+		rect : {
+			x : 0,
+			y : 0,
+			w : 'auto',
+			h : $("#wrap").height()-$("#footer").height()
+		},
+		index : 0,
+		frames : [{
+			name : 'frm_newEle',
+			url : 'frm_newEle.html',
+			bgColor : '#fff'
+		},{
+			name : 'frm_info',
+			url : 'frm_info.html',
+			bgColor : '#fff'
+		}, {
+			name : 'frm_location',
+			url : 'frm_location.html',
+			bgColor : '#fff'
+		}, {
+			name : 'frm_deviceCheck',
+			url : 'frm_deviceCheck.html',
+			bgColor : '#fff'
+		}, {
+			name : 'frm_account',
+			url : 'frm_account.html',
+			bgColor : '#fff'
+		}]
+	}, function(ret, err) {
+		if (ret) {
+			//alert(JSON.stringify(ret));
+		} else {
+			alert(JSON.stringify(err));
+		}
+	});
+}
+
+function eleClick() {
+	keyBackDoNone();
+	backToIndex();
+	$("#addEleIcon").click(function() {
+		api.openFrame({
+			name : 'frm_addElement',
+			url : 'frm_addElement.html',
+			rect : {
+				x : 0,
+				y : 0,
+				w : 'auto',
+				h : 'auto'
+			}
+		});
+	});
+	$("#footerBar li").click(function() {
+		var index;
+		var content = $(this).text();
+		switch(content) {
+			case "信息":
+				index=1;
+				break;
+			case "位置":
+				index=2;
+				break;
+			case "设备检查":
+				index=3;
+				break;
+			case "账户":
+				index=4;
+				break;
+		}
+		api.setFrameGroupIndex({
+		    name: 'group1',
+		    index: index,
+		    scroll: true
+		});
+		
+		
+		
+	});
+}

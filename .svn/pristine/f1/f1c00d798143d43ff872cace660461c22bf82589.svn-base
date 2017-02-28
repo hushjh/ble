@@ -1,0 +1,31 @@
+var	hammerul =new Hammer(document.getElementById("spul"));
+var mx=my=tsx=tsy=0;
+hammerul.on("panmove", function (e) {
+	
+	var divWidth=$("#wrap").width()*0.9;//底部div的宽度
+	var ulWidth=$("#spul").width();//滑动层的宽度
+	
+	if(tsx>=divWidth-ulWidth &&  tsx<=0)
+	{//控制 拖拽，以免超出画布范围
+		tsx=tsx+e.deltaX-mx;//每次只需把拖动的增量 加到画布原点偏移量中，
+		slider();
+	}
+	
+	mx=e.deltaX;//记录前一次拖动的偏移量
+   //document.getElementById("blText").value = "X偏移量：【" + e.deltaX + "】，Y偏移量：【" + e.deltaY + "】<br />";
+   //控制台输出
+});
+
+hammerul.on("panend", function (e) {
+	mx=0;
+});
+
+$("#spul li").click(function(){
+	var offset=$(this).offset();
+	alert( "left: " + offset.left + ", top: " + offset.top );
+});
+
+function slider(){
+	alert("tsx:"+tsx);
+	$("#spul").css("left",tsx);
+}

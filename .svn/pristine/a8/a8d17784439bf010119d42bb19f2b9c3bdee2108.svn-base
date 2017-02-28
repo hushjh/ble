@@ -1,0 +1,78 @@
+* {
+	outline: 0;/*当元素获得焦点的时候，焦点框为0*/
+}
+html, body {
+	height: 100%;
+	font-size: 15px;
+}
+#wrap {
+	height: 100%;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-flex-flow: column;
+	flex-flow: column;
+}
+#header {
+	text-align: center;
+	background-color: #81a9c3;
+	color: #fff;
+	width: 100%;
+	display: -webkit-box;
+	background-color: #000;
+}
+#header h1 {
+	-webkit-box-flex: 1;
+	font-size: 20px;
+	height: 44px;
+	line-height: 44px;
+	margin: 0em;
+	color: #fff;
+}
+#main {
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	flex: 1;
+	background-color: #ff0;
+}
+#footer {
+	height: 50px;
+	line-height: 30px;
+	background-color: #3C3C3C;
+	width: 100%;
+	text-align: center;
+	color: white;
+}
+#footer h5{
+	color: white;
+}
+.backBar {
+	display: inline-block;
+	height: 20px;
+	width: 20px;
+	margin-top: 10px;
+	margin-left: 10px;
+	background-size: 20px 20px;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+.backIcon {
+	background-image: url("../image/backBar.png");
+}
+.newIcon {
+	background-image: url("../image/add.png");
+}
+.wifiIcon {
+	background-image: url("../image/wifi.png");
+}
+.cameraIcon {
+	background-image: url("../image/camera.png");
+}
+.drawLineIcon {
+	background-image: url("../image/drawLine.png");
+}
+.importPicIcon {
+	background-image: url("../image/importPic.png");
+}
+

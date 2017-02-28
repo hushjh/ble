@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	body{
+    		
+    	}
+    	.formD{
+    		margin-top:40px;
+    	}
+    	.inputRow{
+    		margin-left:30px;
+    		margin-top:20px;
+    	}
+    	.spanLb{
+    		width:80px;
+    	}
+    	input{
+    		height:30px;
+    		width:150px;
+    		margin-left:20px;
+    		background-color:#FFFFFF;
+    		border:1px solid #000000;
+    	}
+    	.meterSp{
+    		width:130px;
+    	}
+    	.marLeft{
+    		margin-left:20px;
+    	}
+    	textarea{
+    		width:250px;
+    		height:80px;
+    		background-color:#FFFFFF;
+    	}
+    </style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+		<i class="backBar backIcon"></i>
+		<h1>信息</h1>
+		</div>
+		<div id="main">
+			<div class="formD">
+				<div class="inputRow"><span class="spanLb">平面图</span><input type="text"/></div>
+				<div class="inputRow"><span class="spanLb ">内墙厚度</span><input type="text" class="meterSp"/><span>米</span></div>
+				<div class="inputRow"><span class="spanLb">外墙厚度</span><input type="text" class="meterSp"/><span>米</span></div>
+				<div class="inputRow"><span class="spanLb">天花板高度</span><input type="text" class="meterSp"/><span>米</span></div>
+				<div class="inputRow"><span class="spanLb">作者</span><input type="text"/></div>
+				<div class="inputRow"><span class="spanLb">创建日期</span><span class="marLeft">2016-03-14</span></div>
+				<div class="inputRow"><textarea  placeholder="备注"></textarea></div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		fixStatusBar("header");
+		eleClick();
+	};
+	function eleClick(){
+		backToAddMain();
+	}
+</script>
+</html>

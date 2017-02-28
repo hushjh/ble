@@ -1,0 +1,342 @@
+
+var grid_x=20,grid_y=20;
+var isMouseDown=false;//触控是否开始
+var lastLoc={x:0,y:0};
+var curLoc={x:0,y:0};
+var line=[];//[{startPoint:{x:0,y:0},endPoint:{x:0,y:0}}];//2维数组存线条
+var isNewLine=0;//是否是新画线条
+var isPushMem=true;//是否需要保存触屏的坐标点
+var isM=0;//是否有线条被修改，每次修改isM 值累加1
+var mofifyIndex,changePoint;
+var moveStrokeColor="#ff0000",MemStrokeColor="#000000";//移动中的线条为红色，静止的线条为黑色
+var linWidth=6;
+var delIndex,delPoint={x:0,y:0};
+var startTime,endTime;
+var recx,recy;//画矩形时，矩形的起始坐标点
+apiready = function(){
+		fixStatusBar("header");
+		canvasWidth=$("#main").width();
+		canvasHeight=$("#main").height();
+		canvas=document.getElementById("canvas");
+		context=canvas.getContext("2d");
+		canvas.width=canvasWidth;
+		canvas.height=canvasHeight;
+		
+		drawGrid();
+	};
+///**********************页面按钮事件
+$("#draw").click(function(){
+	if(isNewLine==0){
+		isNewLine=1;//重新画一条线
+	}else{
+		isNewLine=0;//修改以前的线条
+	}
+	$("#draw").toggleClass("active");
+});
+$("#rubishi").click(function(){
+	$(".home").addClass("active");
+	$(".del").removeClass("active");
+	line.splice(delIndex,1);
+	delIndex=-1;
+	
+	context.clearRect(0,0,canvasWidth,canvasHeight);
+	drawGrid();
+	drawMemLine();
+});
+
+$("#oki").click(function(){
+	
+	$(".home").addClass("active");
+	$(".del").removeClass("active");
+	delIndex=-1;
+	
+	context.clearRect(0,0,canvasWidth,canvasHeight);
+	drawGrid();
+	drawMemLine();
+});
+$("#listi").click(function(){
+	drawText();
+});
+
+///////////////触屏事件
+
+canvas.addEventListener('touchstart',function(e){
+	e.preventDefault();
+	touch=e.touches[0];
+	startTime=Date.now();
+	beginStroke({x:touch.pageX,y:touch.pageY});
+});
+canvas.addEventListener('touchmove',function(e){
+	e.preventDefault();
+	if(isMouseDown){
+		touch=e.touches[0];
+		moveStroke({x:touch.pageX,y:touch.pageY});
+	}
+});
+canvas.addEventListener('touchend',function(e){
+	e.preventDefault();
+	endTime=Date.now();
+	endStroke();
+});
+
+////////////////////画线的三个步骤
+function beginStroke(point){
+	isMouseDown=true;
+	isPushMem=true;
+	var tempPoint=windowToCanvas(point.x,point.y);
+	delPoint.x=tempPoint.x;
+	delPoint.y=tempPoint.y;
+    tempPoint=onPoint(tempPoint);
+    lastLoc=tempPoint;
+    if(isNewLine){
+    	lastLoc=tempPoint;
+    }else{
+    	if(line.length>0){
+    		isM=0;//是否有线条被修改
+    		$.each(line,function(i,l){//检测触屏点是否跟画布上线条的端点重合
+	    		if(l.startPoint.x==tempPoint.x ){
+	    			//lastLoc=l.endPoint;
+	    			mofifyIndex=i;
+	    			changePoint=0;
+	    			isM++;
+	    			//line.splice(i,1);//从start的位置开始向后删除delCount个元素
+	    		}else if(l.endPoint.x==tempPoint.x){
+	    			//lastLoc=l.startPoint;
+	    			mofifyIndex=i;
+	    			changePoint=1;
+	    			isM++;
+	    			//line.splice(i,1);//若修改线条，则重数组中删除该线条，
+	    		}
+	    	});
+	    	if(!isM){//没有线条被修改，在移动不划线
+	    		isMouseDown=false;//移动不画线
+	    	}
+    	}else{
+    		isMouseDown=false;//移动不画线
+    	}
+    	isPushMem=false;//如果不是重新画线，则不记录新的点
+    }
+    
+}
+function endStroke(point){
+	isMouseDown=false;
+	if(isPushMem){//如果不是重新画线，则不记录新的点
+		pushMemory(lastLoc,curLoc);
+	}
+	if(isNewLine || isM>0){//如果是新画线，或者有线条被修改，这两个事件结束后将画布上的线条全部变成黑色
+		mofifyIndex=-1; //此时修改结束，不需要将修改的线条画成红色
+		isM=0;//将修改清0
+		context.clearRect(0,0,canvasWidth,canvasHeight);
+		drawGrid();
+		drawMemLine();
+	}
+	if((endTime-startTime)<100){//如果触摸开始与结束的时间差小于100则视为点击事件
+		if(isNewLine){
+		}else{//点击事件不是在新加线条的场景下触发，则检测，点击的坐标是否在某条线上。
+			//alert("delPoint.x:"+delPoint.x+",delPoint.y:"+delPoint.y);
+			if(isOnLine(delPoint)){//如果触摸点在线条上
+				context.clearRect(0,0,canvasWidth,canvasHeight);
+				drawGrid();
+				drawMemLine();
+				$(".del").addClass("active");
+				$(".home").removeClass("active");
+			}else{//如果点击的点不在画布上则刷新画布
+				delIndex=-1;
+				context.clearRect(0,0,canvasWidth,canvasHeight);
+				drawGrid();
+				drawMemLine();
+				$(".home").addClass("active");
+				$(".del").removeClass("active");
+			}
+			
+		}
+	}else{
+		
+	}
+	curLoc={x:0,y:0};
+	
+}
+
+function test(){
+	context.save();   
+	context.beginPath();
+	context.translate(40,40);
+	context.rotate(-45*Math.PI/180);
+	context.rect(0,0,60,6);
+	context.strokeStyle=moveStrokeColor;
+	context.lineWidth=1;
+    alert(context.isPointInPath(delPoint.x,delPoint.y));
+    context.stroke();
+    context.restore();  
+}
+
+function moveStroke(point){
+	curLoc=windowToCanvas(point.x,point.y);
+	curLoc=onPoint(curLoc);
+	//draw
+	//context.save();//保存当前canvas的状态
+	context.clearRect(0,0,canvasWidth,canvasHeight);
+	drawGrid();
+	if(isNewLine){//是否 画新的线条
+		context.beginPath();
+		context.moveTo(lastLoc.x,lastLoc.y);
+		context.lineTo(curLoc.x,curLoc.y);
+	
+		context.strokeStyle=moveStrokeColor;
+		context.lineWidth=linWidth;
+		context.lineCap="round";
+		context.lineJoin="round";
+		context.stroke();
+	}else{//若是修改线条
+		if(changePoint==0){//起点被移动
+			line[mofifyIndex].startPoint.x=curLoc.x;
+			line[mofifyIndex].startPoint.y=curLoc.y;
+		}else{//终点被移动
+			line[mofifyIndex].endPoint.x=curLoc.x;
+			line[mofifyIndex].endPoint.y=curLoc.y;
+		}
+	}
+	drawMemLine();
+	
+	//context.restore();//恢复保存的Canvas的状态
+}
+
+
+function setPos(x1,y1,x2,y2){//设置矩形的起始坐标，和旋转度
+	var rt;
+	if((y1 != y2)){
+		if(x1<x2){//谁的x坐标小，谁为矩形起点
+			recx=x1,recy=y1;
+			//如果起点的y坐标小于终点的坐标，则角度为正，否则为负数
+			rt=Math.atan((y2-y1)/(x2-x1));
+			context.translate(recx,recy);
+			context.rotate(rt);
+		}else if(x1==x2){//线条垂直
+			if(y1<y2){
+				recx=x1,recy=y1;
+			}else{
+				recx=x2,recy=y2;
+			}
+			context.translate(recx,recy);
+			context.rotate(90*Math.PI/180);
+		}else{
+			recx=x2,recy=y2;
+			rt=Math.atan((y1-y2)/(x1-x2));
+			context.translate(recx,recy);
+			context.rotate(rt);
+		}
+		
+	}else{
+		if(x1<x2){
+			recx=x1,recy=y1;
+		}else{
+			recx=x2,recy=y2;
+		}
+	}
+}
+//单击的点是否在线条上
+function isOnLine(point){
+	var x0=point.x,y0=point.y;
+	for(var i=0;i<line.length;i++){
+		var x1=line[i].startPoint.x,y1=line[i].startPoint.y;
+		var x2=line[i].endPoint.x,y2=line[i].endPoint.y;
+		var w=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+		var h=10;
+		context.save();   
+		context.beginPath();
+		setPos(x1,y1,x2,y2);
+		if(y1==y2){
+			context.rect(recx,recy-h/2,w,h);
+		}else{
+			
+			context.rect(0,-h/2,w,h);
+		}
+		context.strokeStyle=moveStrokeColor;
+		context.lineWidth=1;
+		
+	    if(context.isPointInPath(delPoint.x,delPoint.y)){
+	    	context.restore(); 
+	    	delIndex=i;
+	    	return true;
+	    }
+	    //context.stroke();
+	    context.restore(); 
+	    //context.rotate(45*Math.PI/180);
+	    //context.translate(-40,-40);
+	    //context.translate(recx,recy);
+	     
+		}
+		return false;
+}
+//写文本
+function drawText(){
+	for(var i=0;i<line.length;i++){
+		var x1=line[i].startPoint.x,y1=line[i].startPoint.y;
+		var x2=line[i].endPoint.x,y2=line[i].endPoint.y;
+		var w=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+		var h=10;
+		context.save();   
+		
+		setPos(x1,y1,x2,y2);
+		context.textAlign="center";
+		context.textBaseline="top";
+		alert("drawline");
+		context.fillText("线条"+i,w/2,5);//旋转的中心为矩形起点坐标，画布的原点和矩形起点重合
+		
+		
+	    context.restore();  
+		}
+}
+//画线结束后将线条存入内存中
+function pushMemory(startp,endp){
+	var l={startPoint:{x:startp.x,y:startp.y},endPoint:{x:endp.x,y:endp.y}};
+	line.push(l);
+}
+function onPoint(point){//让线条的起点和终点都在网格交点上
+	var xx=point.x;
+	var yy=point.y;
+	return {x:Math.round(xx/grid_x)*grid_x,y:Math.round(yy/grid_y)*grid_y};
+}
+
+function windowToCanvas(x,y){
+	var bbox=canvas.getBoundingClientRect();
+	return {x:Math.round(x-bbox.left),y:Math.round(y-bbox.top)};
+}
+
+//将画布上已存在的线条 画出来
+function drawMemLine(){
+	for(var i=0;i<line.length;i++){
+		context.beginPath();
+		context.moveTo(line[i].startPoint.x,line[i].startPoint.y);
+		context.lineTo(line[i].endPoint.x,line[i].endPoint.y);
+		context.closePath(); 
+		context.lineWidth=linWidth;
+		context.strokeStyle=MemStrokeColor;
+		if(i==mofifyIndex){//若不为新画线，当有线条被修改，需要重新画线时，被修改的线条颜色为红色，其余的为黑色
+			context.strokeStyle=moveStrokeColor;
+		}
+		if(i==delIndex){//若为需要删除的线条，则颜色为红色
+			context.strokeStyle=moveStrokeColor;
+		}
+		context.stroke();
+	}
+}
+//画网格线	
+function drawGrid(){
+	context.strokeStyle="#111111";
+	context.beginPath();
+	//横向画网格线
+	for(var i=1,y=grid_y;y<canvasHeight;y=(++i)*grid_y){
+		context.moveTo(0,y);
+		context.lineTo(canvasWidth,y);
+		
+	}
+	for(var i=1,x=grid_x;x<canvasWidth;x=(++i)*grid_x){
+		context.moveTo(x,0);
+		context.lineTo(x,canvasHeight);
+		
+	}
+	context.lineWidth=0.1;
+	context.stroke();
+
+}

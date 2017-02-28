@@ -1,0 +1,67 @@
+
+var grid_x=20,grid_y=20;
+var isMouseDown=false;
+var lastLoc={x:0,y:0};
+
+apiready = function(){
+		fixStatusBar("header");
+		canvasWidth=$("#main").width();
+		canvasHeight=$("#main").height();
+		canvas=document.getElementById("canvas");
+		context=canvas.getContext("2d");
+		canvas.width=canvasWidth;
+		canvas.height=canvasHeight;
+		
+		drawGrid();
+	};
+
+	
+canvas.addEventListener('touchstart',function(e){
+	e.preventDefault();
+	touch=e.touches[0];
+	alert("touch.pageY:"+touch.pageY);
+	beginStroke({x:touch.pageX,y:touch.pageY});
+});
+canvas.addEventListener('touchmove',function(e){
+	e.preventDefault();
+	if(isMouseDown){
+		touch=e.touches[0];
+		moveStroke({x:touch.pageX,y:touch.pageY});
+	}
+});
+canvas.addEventListener('touchend',function(e){
+	e.preventDefault();
+	endStroke()
+});
+
+function beginStroke(point){
+	isMouseDown=true;
+    lastLoc=windowToCanvas(point.x,point.y);
+    lastTimeStamp=new Date().getTime();
+}
+function endStroke(){
+	isMouseDown=false;
+}
+function windowToCanvas(x,y){
+	var bbox=canvas.getBoundingClientRect();
+	return {x:Math.round(x-bbox.left),y:Math.round(y-bbox.top)};
+}
+//画网格线	
+function drawGrid(){
+	context.strokeStyle="#111111";
+	context.beginPath();
+	//横向画网格线
+	for(var i=1,y=grid_y;y<canvasHeight;y=(++i)*grid_y){
+		context.moveTo(0,y);
+		context.lineTo(canvasWidth,y);
+		
+	}
+	for(var i=1,x=grid_x;x<canvasWidth;x=(++i)*grid_x){
+		context.moveTo(x,0);
+		context.lineTo(x,canvasHeight);
+		
+	}
+	context.lineWidth=0.1;
+	context.stroke();
+
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" type="text/css" href="./css/common.css" />
+    <style type="text/css">
+    	.project{
+    		width:40%;
+    		background-color:#FFFFFF;
+    		margin:20px 10px 5%;
+    		display:-webkit-box;
+    	}
+    	.topDiv{
+    		-webkit-box-flex: 1;
+    	}
+    	.bottomDiv{
+    		height:25px;
+    		text-align:center;
+    	}
+    	.proi{
+    		background-size:20px 20px;
+    		background-position:center;
+    		background-repeat:no-repeat;
+    		background-image:url("/image/add.png");
+    	}
+    
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div id="header">
+            <h1>测距仪</h1>
+        </div>
+        <div id="main">
+        	<div class="project">
+        		<div class="topDiv"><i class="proi"></i></div>
+        		<div class="bottomDiv"><span>新建项目</span></div>
+        	</div>
+        </div>
+        
+    </div>
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="./script/common.js"></script>
+<script type="text/javascript">
+	apiready = function() {
+		setDiv();
+	}
+	function setDiv(){
+		var proWidth=$(".project").width();
+		$(".project").height(proWidth);
+	}
+</script>
+</html>
